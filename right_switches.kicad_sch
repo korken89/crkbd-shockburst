@@ -435,7 +435,7 @@
     (uuid f7b8b358-4834-4040-b1ef-36a8f4787a62)
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 119.38 72.39 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 119.38 72.39 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00cee9ce-ecea-4491-9a90-84f565745a08)
     (property "Reference" "SW216" (at 119.38 67.31 0)
@@ -617,7 +617,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 100.33 59.69 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 100.33 59.69 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 0fa56f32-9fa9-4ad5-a7db-76d95f2f765a)
     (property "Reference" "SW209" (at 100.33 54.61 0)
@@ -658,7 +658,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 138.43 72.39 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 138.43 72.39 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 309daf15-9882-4a36-b974-5948502a94dc)
     (property "Reference" "SW217" (at 138.43 67.31 0)
@@ -746,7 +746,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 81.28 72.39 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 81.28 72.39 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 3c4c2728-24b2-449c-8249-afd9ac13e4b4)
     (property "Reference" "SW214" (at 81.28 67.31 0)
@@ -787,7 +787,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 100.33 72.39 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 100.33 72.39 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 4abf144d-8f57-4726-9cca-b77ac6d99ddb)
     (property "Reference" "SW215" (at 100.33 67.31 0)
@@ -828,7 +828,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 119.38 46.99 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 119.38 46.99 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 4b001ec7-06ae-4572-8760-e0756b5bdff2)
     (property "Reference" "SW204" (at 119.38 41.91 0)
@@ -1057,7 +1057,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 100.33 46.99 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 100.33 46.99 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 62cb0a73-ed42-4635-bea1-5c618a402243)
     (property "Reference" "SW203" (at 100.33 41.91 0)
@@ -1098,7 +1098,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 138.43 46.99 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 138.43 46.99 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 65179714-c68a-4e3e-b120-9f06786a7af6)
     (property "Reference" "SW205" (at 138.43 41.91 0)
@@ -1321,7 +1321,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 62.23 46.99 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 62.23 46.99 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 77cc9fce-41d4-41a8-85a7-be6a0e2b99a2)
     (property "Reference" "SW201" (at 62.23 41.91 0)
@@ -1362,7 +1362,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 62.23 72.39 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 62.23 72.39 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 87c12581-bac7-40cd-9d4a-8f6ccef05199)
     (property "Reference" "SW213" (at 62.23 67.31 0)
@@ -1544,7 +1544,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 157.48 46.99 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 157.48 46.99 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 90b9f072-fe28-43b7-96f4-1e3db043ffbd)
     (property "Reference" "SW206" (at 157.48 41.91 0)
@@ -1585,7 +1585,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 119.38 59.69 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 119.38 59.69 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 942f9a89-a8e6-4cac-ae9c-0c2d1f6539d6)
     (property "Reference" "SW210" (at 119.38 54.61 0)
@@ -1667,7 +1667,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 81.28 59.69 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 81.28 59.69 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid a2a933a6-4529-4ce9-8de2-8749cc294495)
     (property "Reference" "SW208" (at 81.28 54.61 0)
@@ -1708,7 +1708,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 157.48 59.69 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 157.48 59.69 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid b1a55f4d-41eb-4917-b640-7d9d43839eb4)
     (property "Reference" "SW212" (at 157.48 54.61 0)
@@ -1837,7 +1837,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 62.23 59.69 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 62.23 59.69 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid c3b5feda-a60b-4b40-a2a2-76aeea13ab31)
     (property "Reference" "SW207" (at 62.23 54.61 0)
@@ -2066,7 +2066,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 138.43 59.69 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 138.43 59.69 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid dcc3d9e6-abc3-40fe-a73b-03b335b2c996)
     (property "Reference" "SW211" (at 138.43 54.61 0)
@@ -2154,7 +2154,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 81.28 46.99 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 81.28 46.99 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid f58b8977-32ca-4226-af07-ffcd976017b8)
     (property "Reference" "SW202" (at 81.28 41.91 0)
@@ -2242,7 +2242,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 157.48 72.39 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 157.48 72.39 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid ff9942bc-ba64-499a-8fb6-b8419b3b2ca5)
     (property "Reference" "SW218" (at 157.48 67.31 0)
