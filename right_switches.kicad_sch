@@ -435,7 +435,7 @@
     (uuid f7b8b358-4834-4040-b1ef-36a8f4787a62)
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 119.38 72.39 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 119.38 72.39 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00cee9ce-ecea-4491-9a90-84f565745a08)
     (property "Reference" "SW216" (at 119.38 67.31 0)
@@ -459,8 +459,8 @@
     (property "LCSC" "C5156480" (at 119.38 72.39 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 912e6fa8-049c-468c-8714-51b257bd7ecb))
-    (pin "2" (uuid 16bb374b-ca0f-4391-b8f5-ded94bf1ea67))
+    (pin "1" (uuid a93730fe-cd5e-455f-bc4a-da446949441f))
+    (pin "2" (uuid ec604059-7e48-4bad-930d-f1f2d8d8d795))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -506,8 +506,8 @@
     (property "LCSC" "C130885" (at 67.31 49.53 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 6a2cd959-0d39-425b-b335-937eb21b21c8))
-    (pin "2" (uuid a73b9bcb-a8af-456e-ae10-60d9761f3395))
+    (pin "1" (uuid 3cc5b87f-a6d5-4716-acfa-b39db1944b7a))
+    (pin "2" (uuid e44f85b7-ee4c-40eb-a7f0-ae4522eaea0c))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -553,8 +553,8 @@
     (property "LCSC" "C130885" (at 143.51 62.23 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 597267fd-78cc-4802-9109-3e9b95c100a0))
-    (pin "2" (uuid 1528648f-fd2a-4e70-ae8d-7eef21fa2dfd))
+    (pin "1" (uuid 8f76cc50-1212-4fca-9153-9e307b112ed8))
+    (pin "2" (uuid f95ea490-5f2b-4814-8f71-8dcf01948a26))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -600,8 +600,8 @@
     (property "LCSC" "C130885" (at 105.41 49.53 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid c5a45d0a-3125-4343-9d95-2cd63d2ec695))
-    (pin "2" (uuid 9ac3ad92-0d44-4e6b-876d-8b98afc00d95))
+    (pin "1" (uuid d41fcdac-d814-47b3-8657-443d0c0db824))
+    (pin "2" (uuid e7d84c71-b45c-44f6-acc0-b1b84e7b7f2c))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -617,7 +617,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 100.33 59.69 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 100.33 59.69 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 0fa56f32-9fa9-4ad5-a7db-76d95f2f765a)
     (property "Reference" "SW209" (at 100.33 54.61 0)
@@ -641,8 +641,8 @@
     (property "LCSC" "C5156480" (at 100.33 59.69 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 49df8eda-9352-4fbf-8685-6af7fc9ef686))
-    (pin "2" (uuid a1e243ce-dc1f-4dd4-938f-06ecaeb96b4e))
+    (pin "1" (uuid ad63bcf4-739f-4830-a6ae-2096e654d07c))
+    (pin "2" (uuid 6c3cc5cb-fba5-4eff-94d1-0c804d7bf7dc))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -658,7 +658,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 138.43 72.39 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 138.43 72.39 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 309daf15-9882-4a36-b974-5948502a94dc)
     (property "Reference" "SW217" (at 138.43 67.31 0)
@@ -682,8 +682,8 @@
     (property "LCSC" "C5156480" (at 138.43 72.39 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid e8ec0a45-f583-4cde-8261-c5539470a6c8))
-    (pin "2" (uuid 2788f524-40d3-473c-b93b-fea1a8266e81))
+    (pin "1" (uuid c6e4f651-55b2-4ed9-960d-8aae3324b107))
+    (pin "2" (uuid 39228208-c49a-4bd0-b919-7395f7939850))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -729,8 +729,8 @@
     (property "LCSC" "C130885" (at 143.51 87.63 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid e119ad48-da5b-4a8b-98e0-35b420472914))
-    (pin "2" (uuid c5e92e0d-6f45-4999-96bb-3c8ddf38c679))
+    (pin "1" (uuid 48c6a3ba-8e13-4866-85e1-74e15992dde8))
+    (pin "2" (uuid 83f7385a-9c37-47f3-a81e-5637ae906ddc))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -746,7 +746,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 81.28 72.39 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 81.28 72.39 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 3c4c2728-24b2-449c-8249-afd9ac13e4b4)
     (property "Reference" "SW214" (at 81.28 67.31 0)
@@ -770,8 +770,8 @@
     (property "LCSC" "C5156480" (at 81.28 72.39 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 7470542b-a4e4-4232-abd9-6e9a697e30af))
-    (pin "2" (uuid 776925f5-58e0-43c3-b8bb-1878547794c8))
+    (pin "1" (uuid 253bec87-84ac-4a6b-bd7b-cde26df2b346))
+    (pin "2" (uuid 71ebb765-2815-4eba-972e-b6b5df2a7bed))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -787,7 +787,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 100.33 72.39 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 100.33 72.39 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 4abf144d-8f57-4726-9cca-b77ac6d99ddb)
     (property "Reference" "SW215" (at 100.33 67.31 0)
@@ -811,8 +811,8 @@
     (property "LCSC" "C5156480" (at 100.33 72.39 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid cfa2c37f-3caa-49a3-9571-f8e9fc6a586a))
-    (pin "2" (uuid af10885a-abe3-4bd8-9297-5367eb1c4b39))
+    (pin "1" (uuid 9b69d600-2895-4adb-974c-f13305611429))
+    (pin "2" (uuid 3516dc05-40e3-47ff-950d-9b938b831c37))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -828,7 +828,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 119.38 46.99 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 119.38 46.99 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 4b001ec7-06ae-4572-8760-e0756b5bdff2)
     (property "Reference" "SW204" (at 119.38 41.91 0)
@@ -852,8 +852,8 @@
     (property "LCSC" "C5156480" (at 119.38 46.99 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 7ec3d4f8-7a8a-4cab-a45b-a0853a175b9e))
-    (pin "2" (uuid a1fb334b-dab0-474e-8320-2708f53f78a8))
+    (pin "1" (uuid 0da73967-d012-4772-b2ed-06d93e627ce3))
+    (pin "2" (uuid 7b8ea779-c432-406c-95e6-b7eff90ef3cd))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -899,8 +899,8 @@
     (property "LCSC" "C130885" (at 143.51 74.93 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid c3594206-a200-4ae5-91ea-5257a2dc49f5))
-    (pin "2" (uuid d752a24d-7ce7-4554-b36f-2172dffbc669))
+    (pin "1" (uuid f1fe7f9f-bab1-47ed-9172-13056dafdea6))
+    (pin "2" (uuid 6731187f-836f-4f79-9858-3f9f5983eed0))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -946,8 +946,8 @@
     (property "LCSC" "C130885" (at 143.51 49.53 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid b6d20972-ca55-4dad-b739-6ee5aa64d025))
-    (pin "2" (uuid 8e04bfef-8c48-4ba4-9c11-8826c8f4da64))
+    (pin "1" (uuid 599e8eac-2e8e-44ff-b7f8-272ab9f2a011))
+    (pin "2" (uuid e4a65dee-7ec3-4f55-b5f3-bcd4d7775b20))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -993,8 +993,8 @@
     (property "LCSC" "C130885" (at 67.31 74.93 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 4b910e71-9e84-4350-be69-8b1a670b2dab))
-    (pin "2" (uuid b54ee958-aa3f-4681-b411-a5e6ff683ae4))
+    (pin "1" (uuid ff4d661f-c8de-4032-bf79-76960b7dad19))
+    (pin "2" (uuid 651adb2e-ec0d-46ea-b0ec-afd93814bedf))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -1040,8 +1040,8 @@
     (property "LCSC" "C130885" (at 124.46 74.93 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 57bd6100-d7a6-483d-8da2-13acb8dbc064))
-    (pin "2" (uuid 1f6bb76d-c07e-4da2-ba1e-883dde9e7a5a))
+    (pin "1" (uuid d09d5082-9ee8-42f3-9d78-f5f035c6c3c0))
+    (pin "2" (uuid 53b35b5d-685b-44e3-9553-c4feb83b2baf))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -1057,7 +1057,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 100.33 46.99 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 100.33 46.99 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 62cb0a73-ed42-4635-bea1-5c618a402243)
     (property "Reference" "SW203" (at 100.33 41.91 0)
@@ -1081,8 +1081,8 @@
     (property "LCSC" "C5156480" (at 100.33 46.99 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 0bc6aa7b-f352-4cf6-aa30-466ddb76f881))
-    (pin "2" (uuid 503caae4-d9bf-4eca-a76f-ae370ff9c5ca))
+    (pin "1" (uuid f40b762d-c19f-4599-9a8a-7a68b50c501b))
+    (pin "2" (uuid f2f32b6d-15fd-41a2-add7-0240d801c359))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -1098,7 +1098,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 138.43 46.99 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 138.43 46.99 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 65179714-c68a-4e3e-b120-9f06786a7af6)
     (property "Reference" "SW205" (at 138.43 41.91 0)
@@ -1122,8 +1122,8 @@
     (property "LCSC" "C5156480" (at 138.43 46.99 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 794a2794-9c66-4b34-bf7c-81a5bf195c5d))
-    (pin "2" (uuid 88235f67-9838-4f8e-9d34-7ec4e7a8df50))
+    (pin "1" (uuid 6234047c-bccf-4d58-827c-ff36e1765a31))
+    (pin "2" (uuid 7d419845-bed9-4be9-9d6e-19e1e2d0169d))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -1169,8 +1169,8 @@
     (property "LCSC" "C130885" (at 105.41 74.93 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid d6bb09f2-2324-4c2f-bf8b-ec562c029f2b))
-    (pin "2" (uuid e2d5d95a-0123-4035-9e48-df4478b9ffb2))
+    (pin "1" (uuid 233a0614-6d23-4bc6-8b98-0827951b7c39))
+    (pin "2" (uuid 33a2ec7c-71fe-4c5a-99ff-08c1c1a07c85))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -1216,8 +1216,8 @@
     (property "LCSC" "C130885" (at 124.46 49.53 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 3dd7a674-e678-43ff-a22b-2fae1d0abf55))
-    (pin "2" (uuid 7ef617c1-e7eb-4579-8cd0-66f2c6086c4d))
+    (pin "1" (uuid 0762d422-0069-4b24-90e6-5e78683354bc))
+    (pin "2" (uuid c75da401-0620-4517-8900-f75ebd9401b6))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -1263,8 +1263,8 @@
     (property "LCSC" "C130885" (at 124.46 87.63 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid e12774d8-e646-4a1b-a8a3-9dba24b0220c))
-    (pin "2" (uuid 88839525-905f-4309-b529-06a9d923a0ee))
+    (pin "1" (uuid b3196c76-03c0-4511-9731-80073d6d5aa8))
+    (pin "2" (uuid 52f0f943-98b4-4229-b040-ab605f7c2114))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -1304,8 +1304,8 @@
     (property "LCSC" "C5156480" (at 157.48 85.09 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 1402dab0-f380-4127-9a07-adeba2753be3))
-    (pin "2" (uuid d4ccc5db-7119-468a-b193-48fb96f6adfc))
+    (pin "1" (uuid 2f3ae11a-665c-4032-84ff-492d69723c9d))
+    (pin "2" (uuid 1f86c31b-9b6f-49fa-9743-43184e34ebfc))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -1321,7 +1321,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 62.23 46.99 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 62.23 46.99 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 77cc9fce-41d4-41a8-85a7-be6a0e2b99a2)
     (property "Reference" "SW201" (at 62.23 41.91 0)
@@ -1345,8 +1345,8 @@
     (property "LCSC" "C5156480" (at 62.23 46.99 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 05845d53-a4a2-4cfc-91b1-8b49be044eae))
-    (pin "2" (uuid 7cdc9f84-6a23-4df0-bff2-d5614c179d0b))
+    (pin "1" (uuid 0b38d4a3-20b0-4dc4-a40a-9f844da52061))
+    (pin "2" (uuid 6efb9166-0a66-4aba-b23e-03b0408ab838))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -1362,7 +1362,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 62.23 72.39 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 62.23 72.39 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 87c12581-bac7-40cd-9d4a-8f6ccef05199)
     (property "Reference" "SW213" (at 62.23 67.31 0)
@@ -1386,8 +1386,8 @@
     (property "LCSC" "C5156480" (at 62.23 72.39 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid cb1618a7-c5d2-4d85-90c7-61c6381b3997))
-    (pin "2" (uuid c6f66870-870b-4042-ab8c-ab2cf6a1c00b))
+    (pin "1" (uuid d6b2f95e-ccb8-4732-bbc0-e72eaa096966))
+    (pin "2" (uuid 922ca84a-d543-4c14-bb0f-b9380daff6b6))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -1433,8 +1433,8 @@
     (property "LCSC" "C130885" (at 162.56 74.93 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 151620ba-ae95-44f2-b064-3fc9868bc7b8))
-    (pin "2" (uuid edc8f7f5-2953-4026-b9b5-40dac04c3f5d))
+    (pin "1" (uuid 2230d9e1-7a6b-4f01-a2ce-0cb9639c394a))
+    (pin "2" (uuid f1daa119-4eb8-499e-a7eb-8bc665d6bdaa))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -1480,8 +1480,8 @@
     (property "LCSC" "C130885" (at 105.41 62.23 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 30e41186-d18e-4188-89db-07b264f9fddc))
-    (pin "2" (uuid 976baed4-686e-42fe-8d69-a670f4bfa40f))
+    (pin "1" (uuid 46ee2763-ba10-4fa9-9a49-77d36e41ca9b))
+    (pin "2" (uuid ed5b211b-ea81-4054-8306-3e230a4d66b4))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -1527,8 +1527,8 @@
     (property "LCSC" "C130885" (at 162.56 49.53 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 7b0fb4a5-6cff-408c-b992-6c7eb1ff692b))
-    (pin "2" (uuid 5db5e172-76f3-4c6f-890a-806c4d70fc0c))
+    (pin "1" (uuid 8c5c0cb6-fe7f-4c80-94e6-40859c76f4da))
+    (pin "2" (uuid 4555b6f1-a0d6-489b-a8bd-d62518fdf077))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -1544,7 +1544,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 157.48 46.99 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 157.48 46.99 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 90b9f072-fe28-43b7-96f4-1e3db043ffbd)
     (property "Reference" "SW206" (at 157.48 41.91 0)
@@ -1568,8 +1568,8 @@
     (property "LCSC" "C5156480" (at 157.48 46.99 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 9a771761-64d8-4c2d-9de8-24b3ebf965bf))
-    (pin "2" (uuid ab362d92-a724-4e92-ba67-5949d38583a7))
+    (pin "1" (uuid 2ead8584-cc6f-4b61-80b4-bf8e5294d520))
+    (pin "2" (uuid 5d872aba-7cee-4696-aeec-9b9bad7435d3))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -1585,7 +1585,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 119.38 59.69 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 119.38 59.69 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 942f9a89-a8e6-4cac-ae9c-0c2d1f6539d6)
     (property "Reference" "SW210" (at 119.38 54.61 0)
@@ -1609,8 +1609,8 @@
     (property "LCSC" "C5156480" (at 119.38 59.69 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid f3c27ed6-2681-45dc-970d-5d59eb1aba1c))
-    (pin "2" (uuid db70fd2a-e045-446f-8877-4c9f8cb68b1c))
+    (pin "1" (uuid 5bc492bf-664a-44ab-a541-a9d1b2ada557))
+    (pin "2" (uuid 26564a5f-015e-43fe-8050-93fe95d28015))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -1650,8 +1650,8 @@
     (property "LCSC" "C5156480" (at 119.38 85.09 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid e8b37631-ebb8-4258-90a5-f63590de3e8b))
-    (pin "2" (uuid 93336425-18a2-4463-b4ca-91f01a6a2c20))
+    (pin "1" (uuid 0a083681-9c07-4341-bf2a-88c3364a23be))
+    (pin "2" (uuid 9ca16201-ae9e-424b-a1a0-edde0d322406))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -1667,7 +1667,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 81.28 59.69 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 81.28 59.69 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid a2a933a6-4529-4ce9-8de2-8749cc294495)
     (property "Reference" "SW208" (at 81.28 54.61 0)
@@ -1691,8 +1691,8 @@
     (property "LCSC" "C5156480" (at 81.28 59.69 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 2a05040f-16cd-4422-9fe9-53b073fdc850))
-    (pin "2" (uuid e603429c-3e30-4ee5-853b-dec3efcffebb))
+    (pin "1" (uuid 87baaccc-74a0-4644-b554-0e9e8354fdb2))
+    (pin "2" (uuid 8a623438-6603-4c65-b19f-182580bca9d8))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -1708,7 +1708,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 157.48 59.69 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 157.48 59.69 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid b1a55f4d-41eb-4917-b640-7d9d43839eb4)
     (property "Reference" "SW212" (at 157.48 54.61 0)
@@ -1732,8 +1732,8 @@
     (property "LCSC" "C5156480" (at 157.48 59.69 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 78a305e9-a9b8-4830-9fb3-ba6fa760ac80))
-    (pin "2" (uuid 23d7c3e7-44bf-4f05-860e-c6e788f66a96))
+    (pin "1" (uuid 3a075b87-2b43-46b5-9940-8ee02953a845))
+    (pin "2" (uuid 2fda360e-0189-4016-8092-6096cf10f2c8))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -1773,8 +1773,8 @@
     (property "LCSC" "C5156480" (at 138.43 85.09 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid d73e58cb-d8c2-4180-8821-07ac1e4d10bb))
-    (pin "2" (uuid 8a7200f7-8c40-481a-b039-f3a11cf78813))
+    (pin "1" (uuid 8f29c7bf-b472-49a2-9478-7d3cf95a6a16))
+    (pin "2" (uuid eb1fd7ae-023f-4667-bbfc-b957bc749a9c))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -1820,8 +1820,8 @@
     (property "LCSC" "C130885" (at 86.36 62.23 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid eebb2afa-b1cf-4026-a357-b8cded05b93e))
-    (pin "2" (uuid cdaea2b1-d0f1-4cff-a943-a011c8c25f0f))
+    (pin "1" (uuid bf251a55-487b-44d8-be2c-a472086e6dd3))
+    (pin "2" (uuid 1d241590-018b-4cbc-949a-da26d50cae24))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -1837,7 +1837,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 62.23 59.69 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 62.23 59.69 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid c3b5feda-a60b-4b40-a2a2-76aeea13ab31)
     (property "Reference" "SW207" (at 62.23 54.61 0)
@@ -1861,8 +1861,8 @@
     (property "LCSC" "C5156480" (at 62.23 59.69 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 73d9fa75-128e-45c2-887b-e571a88886a9))
-    (pin "2" (uuid 67dba304-343e-4880-81d5-47b0ea38d217))
+    (pin "1" (uuid ad37c685-f26d-4016-aa3d-8ed4ea58fa60))
+    (pin "2" (uuid 44268adf-f742-44db-8581-93a6e16e7af7))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -1908,8 +1908,8 @@
     (property "LCSC" "C130885" (at 124.46 62.23 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 398f11e3-ca58-4d34-81b4-1915fadafb77))
-    (pin "2" (uuid 1dfca3b1-4dc4-48cd-bbef-368b8c671597))
+    (pin "1" (uuid e0ca60d3-2a6e-4829-8365-6243a29c8fbb))
+    (pin "2" (uuid c97a85d4-7b67-4e17-825a-150c8c5af501))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -1955,8 +1955,8 @@
     (property "LCSC" "C130885" (at 86.36 49.53 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid c965b4c0-a982-4a35-bffd-615838ca3c9d))
-    (pin "2" (uuid bbbd598e-ad0b-4be0-9702-95b064728d0d))
+    (pin "1" (uuid 7b869571-e9f8-4a28-8532-d3616fff7b85))
+    (pin "2" (uuid 2dcb0dac-c88b-46f6-95a4-5b82d3ad938b))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -2002,8 +2002,8 @@
     (property "LCSC" "C130885" (at 162.56 87.63 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 8ce575de-51c4-42ed-b14b-937772e02069))
-    (pin "2" (uuid c5c45b05-1108-4935-8933-d53bac5e9a21))
+    (pin "1" (uuid 01802428-1b6f-4ac3-bd83-8a4b74d5b68f))
+    (pin "2" (uuid 29a85759-8239-484a-bcff-83555c83f758))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -2049,8 +2049,8 @@
     (property "LCSC" "C130885" (at 86.36 74.93 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid f966aab9-bee3-4409-b6fc-f9b85705db0e))
-    (pin "2" (uuid 3e5e4deb-2b75-4b41-a8e2-5769c148c8af))
+    (pin "1" (uuid d0d15050-22a2-449f-bb3a-89596f4f2014))
+    (pin "2" (uuid de3a7987-a3bc-4d6c-b600-be3b8a8d67ca))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -2066,7 +2066,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 138.43 59.69 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 138.43 59.69 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid dcc3d9e6-abc3-40fe-a73b-03b335b2c996)
     (property "Reference" "SW211" (at 138.43 54.61 0)
@@ -2090,8 +2090,8 @@
     (property "LCSC" "C5156480" (at 138.43 59.69 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 9dd69d15-3d81-4d5d-a6a1-80cd1b1a8dc1))
-    (pin "2" (uuid 6618840c-e5ca-40d0-a0e8-2165625e8f0c))
+    (pin "1" (uuid f92471e9-2057-4758-b635-04113e5c1aa1))
+    (pin "2" (uuid 1e0b9171-263f-4551-a3db-904c7679ce99))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -2137,8 +2137,8 @@
     (property "LCSC" "C130885" (at 67.31 62.23 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 8cb4c172-2822-488a-8629-13f0e3c34ae1))
-    (pin "2" (uuid 3a3d0715-1cd0-4c67-bda2-0735580fd7f2))
+    (pin "1" (uuid 75acc33f-41d2-4792-9b9c-9dc0d6faa9d1))
+    (pin "2" (uuid 7366b0f3-4a73-4503-bf67-39f09b13d0ee))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -2154,7 +2154,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 81.28 46.99 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 81.28 46.99 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid f58b8977-32ca-4226-af07-ffcd976017b8)
     (property "Reference" "SW202" (at 81.28 41.91 0)
@@ -2178,8 +2178,8 @@
     (property "LCSC" "C5156480" (at 81.28 46.99 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 1f05d04d-fdfb-4d1f-ad04-a0bb09369a79))
-    (pin "2" (uuid f2caee8b-31e7-4458-9b63-c714f2b739ae))
+    (pin "1" (uuid 8ed7afd5-d520-4b32-9e72-47ce73314582))
+    (pin "2" (uuid c2a95b76-61bd-413e-a8bd-e7e4ac707334))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -2225,8 +2225,8 @@
     (property "LCSC" "C130885" (at 162.56 62.23 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 1fadb24b-8113-4613-a224-a829fd67ad78))
-    (pin "2" (uuid 42f8cb9d-dc90-4f4b-87e2-13adfa2b125a))
+    (pin "1" (uuid f78efc5d-e7cc-4763-9850-4fff3ab3cc36))
+    (pin "2" (uuid c3dcd2ec-4876-443e-bf10-f93136e84639))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
@@ -2242,7 +2242,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_Push") (at 157.48 72.39 0) (mirror y) (unit 1)
+  (symbol (lib_id "Switch:SW_Push") (at 157.48 72.39 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid ff9942bc-ba64-499a-8fb6-b8419b3b2ca5)
     (property "Reference" "SW218" (at 157.48 67.31 0)
@@ -2266,8 +2266,8 @@
     (property "LCSC" "C5156480" (at 157.48 72.39 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 8a21af8b-47a9-488f-a451-024fdb428ad8))
-    (pin "2" (uuid 2b873e9c-11a5-4645-bb85-b949e3212484))
+    (pin "1" (uuid 9f714d97-1e3a-48e2-b92d-350b410c3854))
+    (pin "2" (uuid 9c63a236-9126-4fb8-bc82-76e9d4ee9f3a))
     (instances
       (project "crkbd-shockburst"
         (path "/76f7b6ad-1528-4ee8-9fc0-4578616aebf5/03cbda14-d368-4dde-b0d5-76768308216d"
