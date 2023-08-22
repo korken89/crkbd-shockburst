@@ -18,7 +18,7 @@ defmt::timestamp!("{=u64:us}", {
 #[rtic::app(device = embassy_nrf::pac, dispatchers = [SWI0_EGU0], peripherals = false)]
 mod app {
     use crate::keyboard_tasks::*;
-    use corne::bsp::{self, BatteryVoltage, Bsp, KeyMatrix};
+    use corne::bsp::{self, BatteryVoltage, KeyMatrix, KeyboardBsp};
 
     #[shared]
     struct Shared {}
@@ -33,11 +33,11 @@ mod app {
     fn init(cx: init::Context) -> (Shared, Local) {
         defmt::info!("pre init");
 
-        let Bsp {
+        let KeyboardBsp {
             battery_voltage,
             charger_status,
             key_matrix,
-        } = bsp::init(cx.core);
+        } = bsp::init_keyboard(cx.core);
 
         task::spawn().ok();
 

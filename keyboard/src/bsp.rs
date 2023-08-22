@@ -1,7 +1,7 @@
 use embassy_nrf::{
     config::HfclkSource,
     gpio::{AnyPin, Input, Level, Output, OutputDrive, Pin, Pull},
-    peripherals::P0_20,
+    peripherals::{P0_00, P0_20},
     saadc::Saadc,
     {bind_interrupts, saadc},
 };
@@ -37,14 +37,14 @@ bind_interrupts!(struct Irqs {
 
 pub type KeyMatrix = Matrix<Input<'static, AnyPin>, Output<'static, AnyPin>, 6, 4>;
 
-pub struct Bsp {
+pub struct KeyboardBsp {
     pub battery_voltage: BatteryVoltage,
     pub charger_status: ChargerStatus,
     pub key_matrix: KeyMatrix,
 }
 
 #[inline(always)]
-pub fn init(_: cortex_m::Peripherals) -> Bsp {
+pub fn init_keyboard(_: cortex_m::Peripherals) -> KeyboardBsp {
     defmt::info!("BSP init");
 
     let mut config = embassy_nrf::config::Config::default();
@@ -141,7 +141,7 @@ pub fn init(_: cortex_m::Peripherals) -> Bsp {
     Timer0::start(unsafe { core::mem::transmute(()) }, systick_token);
     defmt::info!("init done");
 
-    Bsp {
+    KeyboardBsp {
         battery_voltage,
         charger_status,
         key_matrix,
