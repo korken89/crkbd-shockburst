@@ -159,7 +159,7 @@ impl Radio {
         radio.radio.events_end.reset();
         radio.radio.events_phyend.reset();
 
-        radio.radio.mode.write(|w| w.mode().ieee802154_250kbit());
+        radio.radio.mode.write(|w| w.mode().nrf_1mbit());
 
         // NOTE(unsafe) radio is currently disabled
         unsafe {
@@ -167,7 +167,7 @@ impl Radio {
                 w.s1incl()
                     .clear_bit() // S1 not included in RAM
                     .plen()
-                    ._32bit_zero() // 32-bit zero preamble
+                    ._8bit()
                     .crcinc()
                     .include() // the LENGTH field (the value) also accounts for the CRC (2 bytes)
                     .cilen()
@@ -192,6 +192,9 @@ impl Radio {
                     .whiteen()
                     .clear_bit() // no data whitening
             });
+
+            // Fast ramp-up
+            radio.radio.modecnf0.modify(|_, w| w.ru().fast());
 
             // CRC configuration required by the IEEE spec: x**16 + x**12 + x**5 + 1
             radio
