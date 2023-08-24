@@ -3,4 +3,4 @@ name = "rust"
 
 [language-server.rust-analyzer.config]
 rust-analyzer.checkOnSave.allTargets = false
-rust-analyzer.checkOnSave.extraArgs = ["--bin", "dongle"]
+rust-analyzer.checkOnSave.extraArgs = ["--bins"]

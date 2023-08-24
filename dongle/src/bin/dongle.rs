@@ -18,7 +18,7 @@ defmt::timestamp!("{=u64:us}", {
 #[rtic::app(device = embassy_nrf::pac, dispatchers = [SWI0_EGU0], peripherals = false)]
 mod app {
     use crate::dongle_tasks::*;
-    use corne::bsp::{self, DongleBsp, DongleLed};
+    use corne::bsp::{self, radio::Radio, DongleBsp, DongleLed};
 
     #[shared]
     struct Shared {}
@@ -26,21 +26,22 @@ mod app {
     #[local]
     struct Local {
         led: DongleLed,
+        radio: Radio,
     }
 
     #[init]
     fn init(cx: init::Context) -> (Shared, Local) {
         defmt::info!("pre init");
 
-        let DongleBsp { led, button } = bsp::init_dongle(cx.core);
+        let DongleBsp { led, button, radio } = bsp::init_dongle(cx.core);
 
-        task::spawn().ok();
+        radio_task::spawn().ok();
 
-        (Shared {}, Local { led })
+        (Shared {}, Local { led, radio })
     }
 
     extern "Rust" {
-        #[task(local = [led])]
-        async fn task(_: task::Context);
+        #[task(local = [led, radio])]
+        async fn radio_task(_: radio_task::Context);
     }
 }

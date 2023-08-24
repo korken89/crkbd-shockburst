@@ -4,6 +4,7 @@ authors = ["Emil Fresk <emil.fresk@gmail.com>"]
 name = "corne"
 edition = "2021"
 version = "0.1.0"
+autobins = false
 
 [dependencies]
 keyberon = { git = "https://github.com/TeXitoi/keyberon.git" }
