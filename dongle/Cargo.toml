@@ -8,6 +8,7 @@ autobins = false
 
 [dependencies]
 keyberon = { git = "https://github.com/TeXitoi/keyberon.git" }
+critical-section = "1"
 
 cortex-m = { version = "0.7.7", features = ["critical-section-single-core"] }
 
@@ -17,7 +18,7 @@ panic-probe = { version = "0.3.1", features = ["print-defmt"] }
 #defmt-brtt = { git = "https://github.com/datdenkikniet/defmt-brtt.git" }
 
 rtic = { version = "2.0.1", features = ["thumbv7-backend"] }
-rtic-monotonics = { version = "1.0.1", features = ["defmt", "cortex-m-systick", "nrf52833", "embedded-hal-async"] }
+rtic-monotonics = { version = "1.0.1", features = ["defmt", "nrf52833", "embedded-hal-async"] }
 rtic-sync = "1.0.1"
 rtic-common = "1.0.0"
 

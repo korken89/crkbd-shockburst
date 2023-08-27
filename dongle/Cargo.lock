@@ -88,6 +88,7 @@ name = "corne"
 version = "0.1.0"
 dependencies = [
  "cortex-m",
+ "critical-section",
  "defmt",
  "defmt-rtt",
  "embassy-nrf",

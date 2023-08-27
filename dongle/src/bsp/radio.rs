@@ -1,21 +1,67 @@
 //! IEEE 802.15.4 radio
 
+use super::RadioTimestamps;
+use crate::waker_registration::CriticalSectionWakerRegistration;
 use core::{
-    marker::PhantomData,
     ops::{self, RangeFrom},
     sync::atomic::{self, Ordering},
+    task::Poll,
 };
-
+use cortex_m::peripheral::NVIC;
 use embassy_nrf::pac::{
+    self,
     radio::{state::STATE_A, txpower::TXPOWER_A},
-    RADIO,
+    Interrupt, RADIO,
 };
+use rtic_monotonics::nrf::timer::fugit::{TimerDurationU32, TimerInstantU32};
+
+struct OnDrop<F: FnOnce()> {
+    f: core::mem::MaybeUninit<F>,
+}
+
+impl<F: FnOnce()> OnDrop<F> {
+    pub fn new(f: F) -> Self {
+        Self {
+            f: core::mem::MaybeUninit::new(f),
+        }
+    }
+
+    pub fn defuse(self) {
+        core::mem::forget(self)
+    }
+}
+
+impl<F: FnOnce()> Drop for OnDrop<F> {
+    fn drop(&mut self) {
+        unsafe { self.f.as_ptr().read()() }
+    }
+}
 
 /// IEEE 802.15.4 radio
 pub struct Radio {
     radio: RADIO,
     // RADIO needs to be (re-)enabled to pick up new settings
     needs_enable: bool,
+}
+
+/// Timestamp for when the `address` portion of the packet was sent or received.
+#[derive(Copy, Clone, Debug, defmt::Format, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Timestamp(pub TimerInstantU32<1_000_000>);
+
+static WAKER: CriticalSectionWakerRegistration = CriticalSectionWakerRegistration::new();
+
+// Bind the radio interrupt.
+#[no_mangle]
+#[allow(non_snake_case)]
+unsafe extern "C" fn RADIO() {
+    let radio: pac::RADIO = unsafe { core::mem::transmute(()) };
+
+    // We got an event, clear interrupts and wake the waker.
+    radio.intenclr.write(|w| w.bits(0xffffffff));
+
+    defmt::trace!("RADIO IRQ");
+
+    WAKER.wake()
 }
 
 /// Default Clear Channel Assessment method = Carrier sense
@@ -158,8 +204,10 @@ impl Radio {
         radio.radio.events_disabled.reset();
         radio.radio.events_end.reset();
         radio.radio.events_phyend.reset();
+        radio.radio.events_address.reset();
+        radio.radio.events_ready.reset();
 
-        radio.radio.mode.write(|w| w.mode().nrf_1mbit());
+        radio.radio.mode.write(|w| w.mode().ieee802154_250kbit());
 
         // NOTE(unsafe) radio is currently disabled
         unsafe {
@@ -167,7 +215,7 @@ impl Radio {
                 w.s1incl()
                     .clear_bit() // S1 not included in RAM
                     .plen()
-                    ._8bit()
+                    ._32bit_zero()
                     .crcinc()
                     .include() // the LENGTH field (the value) also accounts for the CRC (2 bytes)
                     .cilen()
@@ -194,7 +242,7 @@ impl Radio {
             });
 
             // Fast ramp-up
-            radio.radio.modecnf0.modify(|_, w| w.ru().fast());
+            // radio.radio.modecnf0.modify(|_, w| w.ru().fast());
 
             // CRC configuration required by the IEEE spec: x**16 + x**12 + x**5 + 1
             radio
@@ -210,6 +258,12 @@ impl Radio {
         radio.set_cca(DEFAULT_CCA);
         radio.set_sfd(DEFAULT_SFD);
         radio.set_txpower(DEFAULT_TXPOWER);
+
+        // Enable the interrupt
+        unsafe {
+            //:set_prio(pac::NVIC_PRIO_BITS, Interrupt::$timer);
+            NVIC::unmask(Interrupt::RADIO);
+        }
 
         radio
     }
@@ -300,87 +354,48 @@ impl Radio {
     /// This methods returns the `Ok` variant if the CRC included the packet was successfully
     /// validated by the hardware; otherwise it returns the `Err` variant. In either case, `packet`
     /// will be updated with the received packet's data
-    pub fn recv(&mut self, packet: &mut Packet) -> Result<u16, u16> {
+    pub async fn recv(&mut self, packet: &mut Packet) -> Result<Timestamp, u16> {
         // Start the read
         // NOTE(unsafe) We block until reception completes or errors
         unsafe {
             self.start_recv(packet);
         }
 
+        let dropper = OnDrop::new(|| Self::cancel_recv());
+
         // wait until we have received something
-        self.wait_for_event(Event::End);
+        core::future::poll_fn(|cx| {
+            WAKER.register(cx.waker());
+
+            if self.event_happened_and_reset(Event::End) {
+                defmt::trace!("RX done poll");
+                self.disable_interrupt(Event::End);
+
+                Poll::Ready(())
+            } else {
+                defmt::trace!("RX enable IRQ");
+                self.enable_interrupt(Event::End);
+                defmt::trace!("RX pending poll");
+                Poll::Pending
+            }
+        })
+        .await;
+
         dma_end_fence();
-        defmt::trace!("Got RX end");
+        dropper.defuse();
+
+        let timestamp = RadioTimestamps::address_timestamp();
+
+        defmt::debug!("RX complete, address received at {}", timestamp);
 
         let crc = self.radio.rxcrc.read().rxcrc().bits() as u16;
         if self.radio.crcstatus.read().crcstatus().bit_is_set() {
             defmt::trace!("RX CRC OK");
-            Ok(crc)
+            Ok(Timestamp(timestamp))
         } else {
             Err(crc)
         }
     }
-
-    // /// Listens for a packet for no longer than the specified amount of microseconds
-    // /// and copies its contents into the given `packet` buffer
-    // ///
-    // /// If no packet is received within the specified time then the `Timeout` error is returned
-    // ///
-    // /// If a packet is received within the time span then the packet CRC is checked. If the CRC is
-    // /// incorrect then the `Crc` error is returned; otherwise the `Ok` variant is returned.
-    // /// Note that `packet` will contain the packet in any case, even if the CRC check failed.
-    // ///
-    // /// Note that the time it takes to switch the radio to RX mode is included in the timeout count.
-    // /// This transition may take up to a hundred of microseconds; see the section 6.20.15.8 in the
-    // /// Product Specification for more details about timing
-    // pub fn recv_timeout<I>(
-    //     &mut self,
-    //     packet: &mut Packet,
-    //     timer: &mut Timer<I>,
-    //     microseconds: u32,
-    // ) -> Result<u16, Error>
-    // where
-    //     I: timer::Instance,
-    // {
-    //     // Start the timeout timer
-    //     timer.start(microseconds);
-
-    //     // Start the read
-    //     // NOTE(unsafe) We block until reception completes or errors
-    //     unsafe {
-    //         self.start_recv(packet);
-    //     }
-
-    //     // Wait for transmission to end
-    //     let mut recv_completed = false;
-
-    //     loop {
-    //         if self.radio.events_end.read().bits() != 0 {
-    //             // transfer complete
-    //             dma_end_fence();
-    //             recv_completed = true;
-    //             break;
-    //         }
-
-    //         if timer.wait().is_ok() {
-    //             // timeout
-    //             break;
-    //         }
-    //     }
-
-    //     if !recv_completed {
-    //         // Cancel the reception if it did not complete until now
-    //         self.cancel_recv();
-    //         Err(Error::Timeout)
-    //     } else {
-    //         let crc = self.radio.rxcrc.read().rxcrc().bits() as u16;
-    //         if self.radio.crcstatus.read().crcstatus().bit_is_set() {
-    //             Ok(crc)
-    //         } else {
-    //             Err(Error::Crc(crc))
-    //         }
-    //     }
-    // }
 
     unsafe fn start_recv(&mut self, packet: &mut Packet) {
         // NOTE we do NOT check the address of `packet` because the mutable reference ensures it's
@@ -389,6 +404,8 @@ impl Radio {
         // clear related events
         self.radio.events_phyend.reset();
         self.radio.events_end.reset();
+        self.radio.events_ready.reset();
+        self.radio.events_address.reset();
 
         self.put_in_rx_mode();
         defmt::trace!("Into RX mode");
@@ -405,79 +422,81 @@ impl Radio {
         defmt::trace!("Start receiving");
     }
 
-    fn cancel_recv(&mut self) {
-        self.radio.tasks_stop.write(|w| w.tasks_stop().set_bit());
-        self.wait_for_state_a(STATE_A::RX_IDLE);
+    fn cancel_recv() {
+        let radio: pac::RADIO = unsafe { core::mem::transmute(()) };
+        radio.tasks_stop.write(|w| w.tasks_stop().set_bit());
+        while radio.state.read().state().variant().unwrap() != STATE_A::RX_IDLE {}
         // DMA transfer may have been in progress so synchronize with its memory operations
         dma_end_fence();
     }
 
-    /// Tries to send the given `packet`
-    ///
-    /// This method performs Clear Channel Assessment (CCA) first and sends the `packet` only if the
-    /// channel is observed to be *clear* (no transmission is currently ongoing), otherwise no
-    /// packet is transmitted and the `Err` variant is returned
-    ///
-    /// NOTE this method will *not* modify the `packet` argument. The mutable reference is used to
-    /// ensure the `packet` buffer is allocated in RAM, which is required by the RADIO peripheral
-    // NOTE we do NOT check the address of `packet` because the mutable reference ensures it's
-    // allocated in RAM
-    pub fn try_send(&mut self, packet: &mut Packet) -> Result<(), ()> {
-        // enable radio to perform cca
-        self.put_in_rx_mode();
+    // /// Tries to send the given `packet`
+    // ///
+    // /// This method performs Clear Channel Assessment (CCA) first and sends the `packet` only if the
+    // /// channel is observed to be *clear* (no transmission is currently ongoing), otherwise no
+    // /// packet is transmitted and the `Err` variant is returned
+    // ///
+    // /// NOTE this method will *not* modify the `packet` argument. The mutable reference is used to
+    // /// ensure the `packet` buffer is allocated in RAM, which is required by the RADIO peripheral
+    // // NOTE we do NOT check the address of `packet` because the mutable reference ensures it's
+    // // allocated in RAM
+    // pub fn try_send(&mut self, packet: &mut Packet) -> Result<(), ()> {
+    //     // enable radio to perform cca
+    //     self.put_in_rx_mode();
 
-        // clear related events
-        self.radio.events_phyend.reset();
-        self.radio.events_end.reset();
+    //     // clear related events
+    //     self.radio.events_phyend.reset();
+    //     self.radio.events_end.reset();
+    //     self.radio.events_ready.reset();
 
-        // NOTE(unsafe) DMA transfer has not yet started
-        unsafe {
-            self.radio
-                .packetptr
-                .write(|w| w.packetptr().bits(packet.buffer.as_ptr() as u32));
-        }
+    //     // NOTE(unsafe) DMA transfer has not yet started
+    //     unsafe {
+    //         self.radio
+    //             .packetptr
+    //             .write(|w| w.packetptr().bits(packet.buffer.as_ptr() as u32));
+    //     }
 
-        // configure radio to immediately start transmission if the channel is idle
-        self.radio.shorts.modify(|_, w| {
-            w.ccaidle_txen()
-                .set_bit()
-                .txready_start()
-                .set_bit()
-                .end_disable()
-                .set_bit()
-        });
+    //     // configure radio to immediately start transmission if the channel is idle
+    //     self.radio.shorts.modify(|_, w| {
+    //         w.ccaidle_txen()
+    //             .set_bit()
+    //             .txready_start()
+    //             .set_bit()
+    //             .end_disable()
+    //             .set_bit()
+    //     });
 
-        // the DMA transfer will start at some point after the following write operation so
-        // we place the compiler fence here
-        dma_start_fence();
-        // start CCA. In case the channel is clear, the data at packetptr will be sent automatically
-        self.radio
-            .tasks_ccastart
-            .write(|w| w.tasks_ccastart().set_bit());
+    //     // the DMA transfer will start at some point after the following write operation so
+    //     // we place the compiler fence here
+    //     dma_start_fence();
+    //     // start CCA. In case the channel is clear, the data at packetptr will be sent automatically
+    //     self.radio
+    //         .tasks_ccastart
+    //         .write(|w| w.tasks_ccastart().set_bit());
 
-        loop {
-            if self.radio.events_phyend.read().events_phyend().bit_is_set() {
-                // transmission completed
-                dma_end_fence();
-                self.radio.events_phyend.reset();
-                self.radio.shorts.reset();
-                return Ok(());
-            }
+    //     loop {
+    //         if self.radio.events_phyend.read().events_phyend().bit_is_set() {
+    //             // transmission completed
+    //             dma_end_fence();
+    //             self.radio.events_phyend.reset();
+    //             self.radio.shorts.reset();
+    //             return Ok(());
+    //         }
 
-            if self
-                .radio
-                .events_ccabusy
-                .read()
-                .events_ccabusy()
-                .bit_is_set()
-            {
-                // channel is busy
-                self.radio.events_ccabusy.reset();
-                self.radio.shorts.reset();
-                return Err(());
-            }
-        }
-    }
+    //         if self
+    //             .radio
+    //             .events_ccabusy
+    //             .read()
+    //             .events_ccabusy()
+    //             .bit_is_set()
+    //         {
+    //             // channel is busy
+    //             self.radio.events_ccabusy.reset();
+    //             self.radio.shorts.reset();
+    //             return Err(());
+    //         }
+    //     }
+    // }
 
     /// Sends the given `packet`
     ///
@@ -489,7 +508,7 @@ impl Radio {
     /// ensure the `packet` buffer is allocated in RAM, which is required by the RADIO peripheral
     // NOTE we do NOT check the address of `packet` because the mutable reference ensures it's
     // allocated in RAM
-    pub fn send(&mut self, packet: &mut Packet) {
+    pub async fn send(&mut self, packet: &mut Packet) -> Timestamp {
         // enable radio to perform cca
         self.put_in_rx_mode();
         defmt::trace!("In RX mode to find CCA");
@@ -497,6 +516,7 @@ impl Radio {
         // clear related events
         self.radio.events_phyend.reset();
         self.radio.events_end.reset();
+        self.radio.events_ready.reset();
 
         // immediately start transmission if the channel is idle
         self.radio.shorts.modify(|_, w| {
@@ -518,38 +538,43 @@ impl Radio {
                 .write(|w| w.packetptr().bits(packet.buffer.as_ptr() as u32));
         }
 
-        'cca: loop {
-            // start CCA (+ sending if channel is clear)
-            self.radio
-                .tasks_ccastart
-                .write(|w| w.tasks_ccastart().set_bit());
-            defmt::trace!("Search for CCA...");
+        // start CCA (+ sending if channel is clear)
+        self.radio
+            .tasks_ccastart
+            .write(|w| w.tasks_ccastart().set_bit());
 
-            loop {
-                if self.radio.events_phyend.read().events_phyend().bit_is_set() {
-                    dma_end_fence();
-                    // transmission is complete
-                    self.radio.events_phyend.reset();
-                    defmt::trace!("TX complete");
-                    break 'cca;
-                }
+        defmt::trace!("Search for CCA...");
 
-                if self
-                    .radio
-                    .events_ccabusy
-                    .read()
-                    .events_ccabusy()
-                    .bit_is_set()
-                {
-                    // channel is busy; try another CCA
-                    defmt::trace!("Channel busy, try again...");
-                    self.radio.events_ccabusy.reset();
-                    continue 'cca;
-                }
+        core::future::poll_fn(|cx| {
+            WAKER.register(cx.waker());
+
+            if self.event_happened_and_reset(Event::PhyEnd) {
+                self.disable_interrupt(Event::PhyEnd);
+                self.disable_interrupt(Event::CcaBusy);
+
+                return Poll::Ready(());
+            } else if self.event_happened_and_reset(Event::CcaBusy) {
+                // Try CCA again
+                self.radio
+                    .tasks_ccastart
+                    .write(|w| w.tasks_ccastart().set_bit());
+                defmt::trace!("Collision, CCA again...");
             }
-        }
+
+            self.enable_interrupt(Event::PhyEnd);
+            self.enable_interrupt(Event::CcaBusy);
+
+            Poll::Pending
+        })
+        .await;
+
+        let timestamp = RadioTimestamps::address_timestamp();
+
+        defmt::debug!("TX complete, address sent at: {}", timestamp);
 
         self.radio.shorts.reset();
+
+        Timestamp(timestamp)
     }
 
     /// Sends the specified `packet` without first performing CCA
@@ -560,7 +585,7 @@ impl Radio {
     /// ensure the `packet` buffer is allocated in RAM, which is required by the RADIO peripheral
     // NOTE we do NOT check the address of `packet` because the mutable reference ensures it's
     // allocated in RAM
-    pub fn send_no_cca(&mut self, packet: &mut Packet) {
+    pub async fn send_no_cca(&mut self, packet: &mut Packet) -> Timestamp {
         self.put_in_tx_mode();
 
         // clear related events
@@ -581,8 +606,24 @@ impl Radio {
         dma_start_fence();
         self.radio.tasks_start.write(|w| w.tasks_start().set_bit());
 
-        self.wait_for_event(Event::PhyEnd);
+        core::future::poll_fn(|cx| {
+            WAKER.register(cx.waker());
+            self.enable_interrupt(Event::PhyEnd);
+
+            if self.event_happened_and_reset(Event::PhyEnd) {
+                self.disable_interrupt(Event::PhyEnd);
+                Poll::Ready(())
+            } else {
+                Poll::Pending
+            }
+        })
+        .await;
+
+        let timestamp = RadioTimestamps::address_timestamp();
+
         self.radio.shorts.reset();
+
+        Timestamp(timestamp)
     }
 
     /// Moves the radio from any state to the DISABLED state
@@ -676,23 +717,66 @@ impl Radio {
         }
     }
 
-    fn wait_for_event(&self, event: Event) {
+    /// Enable interrupt.
+    fn enable_interrupt(&self, event: Event) {
         match event {
             Event::End => {
-                while self.radio.events_end.read().events_end().bit_is_clear() {}
-                self.radio.events_end.reset();
+                self.radio.intenset.write(|w| w.end().set_bit());
             }
             Event::PhyEnd => {
-                while self
-                    .radio
-                    .events_phyend
-                    .read()
-                    .events_phyend()
-                    .bit_is_clear()
-                {}
-                self.radio.events_phyend.reset();
+                self.radio.intenset.write(|w| w.phyend().set_bit());
+            }
+            Event::CcaBusy => {
+                self.radio.intenset.write(|w| w.ccabusy().set_bit());
             }
         }
+    }
+
+    /// Disable interrupt.
+    fn disable_interrupt(&self, event: Event) {
+        match event {
+            Event::End => {
+                self.radio.intenclr.write(|w| w.end().set_bit());
+            }
+            Event::PhyEnd => {
+                self.radio.intenclr.write(|w| w.phyend().set_bit());
+            }
+            Event::CcaBusy => {
+                self.radio.intenclr.write(|w| w.phyend().set_bit());
+            }
+        }
+    }
+
+    /// Return true if event has happened.
+    fn event_happened_and_reset(&self, event: Event) -> bool {
+        match event {
+            Event::End => {
+                if self.radio.events_end.read().events_end().bit_is_set() {
+                    self.radio.events_end.reset();
+                    return true;
+                }
+            }
+            Event::PhyEnd => {
+                if self.radio.events_phyend.read().events_phyend().bit_is_set() {
+                    self.radio.events_phyend.reset();
+                    return true;
+                }
+            }
+            Event::CcaBusy => {
+                if self
+                    .radio
+                    .events_ccabusy
+                    .read()
+                    .events_ccabusy()
+                    .bit_is_set()
+                {
+                    self.radio.events_ccabusy.reset();
+                    return true;
+                }
+            }
+        }
+
+        false
     }
 
     /// Waits until the radio state matches the given `state`
@@ -734,6 +818,7 @@ fn dma_end_fence() {
 enum Event {
     End,
     PhyEnd,
+    CcaBusy,
 }
 
 /// An IEEE 802.15.4 packet
