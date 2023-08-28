@@ -207,7 +207,30 @@ impl Radio {
         radio.radio.events_address.reset();
         radio.radio.events_ready.reset();
 
-        radio.radio.mode.write(|w| w.mode().ieee802154_250kbit());
+        radio.radio.mode.write(|w| w.mode().nrf_2mbit());
+
+        let base0 = [0xE7, 0xE7, 0xE7, 0xE7];
+        let base1 = [0xC2, 0xC2, 0xC2, 0xC2];
+        let prefix0 = [0xE7, 0xC2, 0xC3, 0xC4];
+        let prefix1 = [0xC5, 0xC6, 0xC7, 0xC8];
+
+        radio
+            .radio
+            .base0
+            .write(|w| unsafe { w.bits(u32::from_le_bytes(base0)) });
+        radio
+            .radio
+            .base1
+            .write(|w| unsafe { w.bits(u32::from_le_bytes(base1)) });
+
+        radio
+            .radio
+            .prefix0
+            .write(|w| unsafe { w.bits(u32::from_le_bytes(prefix0)) });
+        radio
+            .radio
+            .prefix1
+            .write(|w| unsafe { w.bits(u32::from_le_bytes(prefix1)) });
 
         // NOTE(unsafe) radio is currently disabled
         unsafe {
@@ -215,7 +238,7 @@ impl Radio {
                 w.s1incl()
                     .clear_bit() // S1 not included in RAM
                     .plen()
-                    ._32bit_zero()
+                    ._8bit()
                     .crcinc()
                     .include() // the LENGTH field (the value) also accounts for the CRC (2 bytes)
                     .cilen()
@@ -234,7 +257,7 @@ impl Radio {
                     .statlen()
                     .bits(0) // no static length
                     .balen()
-                    .bits(0) // no base address
+                    .bits(4) // no base address
                     .endian()
                     .clear_bit() // little endian
                     .whiteen()
@@ -242,13 +265,10 @@ impl Radio {
             });
 
             // Fast ramp-up
-            // radio.radio.modecnf0.modify(|_, w| w.ru().fast());
+            radio.radio.modecnf0.modify(|_, w| w.ru().fast());
 
             // CRC configuration required by the IEEE spec: x**16 + x**12 + x**5 + 1
-            radio
-                .radio
-                .crccnf
-                .write(|w| w.len().two().skipaddr().ieee802154());
+            radio.radio.crccnf.write(|w| w.len().two());
             radio.radio.crcpoly.write(|w| w.crcpoly().bits(0x11021));
             radio.radio.crcinit.write(|w| w.crcinit().bits(0));
         }
@@ -307,48 +327,6 @@ impl Radio {
             .write(|w| w.txpower().variant(power._into()));
     }
 
-    /// Sample the received signal power (i.e. the presence of possibly interfering signals)
-    /// within the bandwidth of the currently used channel for `sample_cycles` iterations.
-    /// Note that one iteration has a sample time of 128μs, and that each iteration produces the
-    /// average RSSI value measured during this sample time.
-    ///
-    /// Returns the *maximum* measurement recorded during sampling as reported by the hardware (not in dBm!).
-    /// The result can be used to find a suitable ED threshold for Energy Detection-based CCA mechanisms.
-    ///
-    /// For details, see Section 6.20.12.3 Energy detection (ED) of the PS.
-    /// RSSI samples are averaged over a measurement time of 8 symbol periods (128 μs).
-    pub fn energy_detection_scan(&mut self, sample_cycles: u32) -> u8 {
-        unsafe {
-            // Increase the time spent listening
-            self.radio.edcnt.write(|w| w.edcnt().bits(sample_cycles));
-        }
-
-        // ensure that the shortcut between READY event and START task is disabled before putting
-        // the radio into recv mode
-        self.radio.shorts.reset();
-        self.put_in_rx_mode();
-
-        // clear related events
-        self.radio.events_edend.reset();
-
-        // start energy detection sampling
-        self.radio
-            .tasks_edstart
-            .write(|w| w.tasks_edstart().set_bit());
-
-        loop {
-            if self.radio.events_edend.read().events_edend().bit_is_set() {
-                // sampling period is over; collect value
-                self.radio.events_edend.reset();
-
-                // note that since we have increased EDCNT, the EDSAMPLE register contains the
-                // maximum recorded value, not the average
-                let read_lvl = self.radio.edsample.read().edlvl().bits();
-                return read_lvl;
-            }
-        }
-    }
-
     /// Receives one radio packet and copies its contents into the given `packet` buffer
     ///
     /// This methods returns the `Ok` variant if the CRC included the packet was successfully
@@ -385,8 +363,13 @@ impl Radio {
         dropper.defuse();
 
         let timestamp = RadioTimestamps::address_timestamp();
+        let rssi = self.radio.rssisample.read().rssisample().bits();
 
-        defmt::debug!("RX complete, address received at {}", timestamp);
+        defmt::debug!(
+            "RX complete, address received at {}, rssi = -{} dBm",
+            timestamp,
+            rssi
+        );
 
         let crc = self.radio.rxcrc.read().rxcrc().bits() as u16;
         if self.radio.crcstatus.read().crcstatus().bit_is_set() {
@@ -429,74 +412,6 @@ impl Radio {
         // DMA transfer may have been in progress so synchronize with its memory operations
         dma_end_fence();
     }
-
-    // /// Tries to send the given `packet`
-    // ///
-    // /// This method performs Clear Channel Assessment (CCA) first and sends the `packet` only if the
-    // /// channel is observed to be *clear* (no transmission is currently ongoing), otherwise no
-    // /// packet is transmitted and the `Err` variant is returned
-    // ///
-    // /// NOTE this method will *not* modify the `packet` argument. The mutable reference is used to
-    // /// ensure the `packet` buffer is allocated in RAM, which is required by the RADIO peripheral
-    // // NOTE we do NOT check the address of `packet` because the mutable reference ensures it's
-    // // allocated in RAM
-    // pub fn try_send(&mut self, packet: &mut Packet) -> Result<(), ()> {
-    //     // enable radio to perform cca
-    //     self.put_in_rx_mode();
-
-    //     // clear related events
-    //     self.radio.events_phyend.reset();
-    //     self.radio.events_end.reset();
-    //     self.radio.events_ready.reset();
-
-    //     // NOTE(unsafe) DMA transfer has not yet started
-    //     unsafe {
-    //         self.radio
-    //             .packetptr
-    //             .write(|w| w.packetptr().bits(packet.buffer.as_ptr() as u32));
-    //     }
-
-    //     // configure radio to immediately start transmission if the channel is idle
-    //     self.radio.shorts.modify(|_, w| {
-    //         w.ccaidle_txen()
-    //             .set_bit()
-    //             .txready_start()
-    //             .set_bit()
-    //             .end_disable()
-    //             .set_bit()
-    //     });
-
-    //     // the DMA transfer will start at some point after the following write operation so
-    //     // we place the compiler fence here
-    //     dma_start_fence();
-    //     // start CCA. In case the channel is clear, the data at packetptr will be sent automatically
-    //     self.radio
-    //         .tasks_ccastart
-    //         .write(|w| w.tasks_ccastart().set_bit());
-
-    //     loop {
-    //         if self.radio.events_phyend.read().events_phyend().bit_is_set() {
-    //             // transmission completed
-    //             dma_end_fence();
-    //             self.radio.events_phyend.reset();
-    //             self.radio.shorts.reset();
-    //             return Ok(());
-    //         }
-
-    //         if self
-    //             .radio
-    //             .events_ccabusy
-    //             .read()
-    //             .events_ccabusy()
-    //             .bit_is_set()
-    //         {
-    //             // channel is busy
-    //             self.radio.events_ccabusy.reset();
-    //             self.radio.shorts.reset();
-    //             return Err(());
-    //         }
-    //     }
-    // }
 
     /// Sends the given `packet`
     ///
@@ -675,6 +590,14 @@ impl Radio {
             State::TxIdle => (true, true),
         };
 
+        self.radio.rxaddresses.write(|w| unsafe { w.bits(0xff) });
+        self.radio.shorts.modify(|_, w| {
+            w.address_rssistart()
+                .enabled()
+                .disabled_rssistop()
+                .enabled()
+        });
+
         if disable {
             self.radio
                 .tasks_disable
@@ -692,6 +615,10 @@ impl Radio {
     /// Moves the radio to the TXIDLE state
     fn put_in_tx_mode(&mut self) {
         let state = self.state();
+
+        self.radio
+            .txaddress
+            .write(|w| unsafe { w.txaddress().bits(0) });
 
         if state != State::TxIdle || self.needs_enable {
             self.needs_enable = false;
