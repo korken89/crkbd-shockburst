@@ -19,14 +19,8 @@ pub async fn radio_task(cx: radio_task::Context<'_>) -> ! {
         }
 
         let r = radio.recv(&mut packet).await;
-        let lqi = packet.lqi();
 
-        defmt::info!(
-            "Radio receive finished with {} (RSSI = -{} dBm), packet: {}",
-            r,
-            lqi,
-            *packet
-        );
+        defmt::info!("Radio receive finished with {}, packet: {}", r, *packet);
     }
 
     // // TX code:

@@ -48,6 +48,10 @@ pub struct Radio {
 #[derive(Copy, Clone, Debug, defmt::Format, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Timestamp(pub TimerInstantU32<1_000_000>);
 
+/// RSSI value in dBm.
+#[derive(Copy, Clone, Debug, defmt::Format, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Rssi(pub i8);
+
 static WAKER: CriticalSectionWakerRegistration = CriticalSectionWakerRegistration::new();
 
 // Bind the radio interrupt.
@@ -244,7 +248,7 @@ impl Radio {
                     .cilen()
                     .bits(0) // no code indicator
                     .lflen()
-                    .bits(8) // length = 8 bits (but highest bit is reserved and must be `0`)
+                    .bits(7) // length = 8 bits (but highest bit is reserved and must be `0`)
                     .s0len()
                     .clear_bit() // no S0
                     .s1len()
@@ -332,7 +336,7 @@ impl Radio {
     /// This methods returns the `Ok` variant if the CRC included the packet was successfully
     /// validated by the hardware; otherwise it returns the `Err` variant. In either case, `packet`
     /// will be updated with the received packet's data
-    pub async fn recv(&mut self, packet: &mut Packet) -> Result<Timestamp, u16> {
+    pub async fn recv(&mut self, packet: &mut Packet) -> Result<(Timestamp, Rssi), u16> {
         // Start the read
         // NOTE(unsafe) We block until reception completes or errors
         unsafe {
@@ -363,7 +367,7 @@ impl Radio {
         dropper.defuse();
 
         let timestamp = RadioTimestamps::address_timestamp();
-        let rssi = self.radio.rssisample.read().rssisample().bits();
+        let rssi = self.radio.rssisample.read().rssisample().bits() as i8;
 
         defmt::debug!(
             "RX complete, address received at {}, rssi = -{} dBm",
@@ -374,7 +378,7 @@ impl Radio {
         let crc = self.radio.rxcrc.read().rxcrc().bits() as u16;
         if self.radio.crcstatus.read().crcstatus().bit_is_set() {
             defmt::trace!("RX CRC OK");
-            Ok(Timestamp(timestamp))
+            Ok((Timestamp(timestamp), Rssi(-rssi)))
         } else {
             Err(crc)
         }
@@ -809,19 +813,6 @@ impl Packet {
     pub fn set_len(&mut self, len: u8) {
         assert!(len <= Self::CAPACITY);
         self.buffer[Self::PHY_HDR] = len + Self::CRC;
-    }
-
-    /// Returns the LQI (Link Quality Indicator) of the received packet
-    ///
-    /// Note that the LQI is stored in the `Packet`'s internal buffer by the hardware so the value
-    /// returned by this method is only valid after a `Radio.recv` operation. Operations that
-    /// modify the `Packet`, like `copy_from_slice` or `set_len`+`deref_mut`, will overwrite the
-    /// stored LQI value.
-    ///
-    /// Also note that the hardware will *not* compute a LQI for packets smaller than 3 bytes so
-    /// this method will return an invalid value for those packets.
-    pub fn lqi(&self) -> u8 {
-        self.buffer[1 /* PHY_HDR */ + self.len() as usize /* data */]
     }
 }
 
