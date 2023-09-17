@@ -58,7 +58,7 @@ static WAKER: CriticalSectionWakerRegistration = CriticalSectionWakerRegistratio
 #[no_mangle]
 #[allow(non_snake_case)]
 unsafe extern "C" fn RADIO() {
-    let radio: pac::RADIO = unsafe { core::mem::transmute(()) };
+    let radio = unsafe { &*pac::RADIO::PTR };
 
     // We got an event, clear interrupts and wake the waker.
     radio.intenclr.write(|w| w.bits(0xffffffff));
@@ -527,12 +527,12 @@ impl Radio {
 
         core::future::poll_fn(|cx| {
             WAKER.register(cx.waker());
-            self.enable_interrupt(Event::PhyEnd);
 
             if self.event_happened_and_reset(Event::PhyEnd) {
                 self.disable_interrupt(Event::PhyEnd);
                 Poll::Ready(())
             } else {
+                self.enable_interrupt(Event::PhyEnd);
                 Poll::Pending
             }
         })
