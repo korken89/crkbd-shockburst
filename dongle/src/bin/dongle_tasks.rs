@@ -71,6 +71,13 @@ pub async fn radio_task(cx: radio_task::Context<'_>) -> ! {
         defmt::info!("Trying to send...");
         //let start = Timer0::now();
         let timestamp = radio.send(&mut packet).await.0;
+
+        // Look for ACK (TODO: Until the end of slot - guard time)
+        match Timer0::timeout_after(1300.micros(), radio.recv(&mut packet)).await {
+            Ok(_) => defmt::info!("Got ack!"),
+            Err(_timeout) => defmt::info!("No ack..."),
+        };
+
         //let end = Timer0::now();
         defmt::info!("Packet sent! TX at {}", timestamp);
 
