@@ -45,11 +45,12 @@ mod keyboard_app {
             battery_voltage,
             charger_status,
             key_matrix,
+            is_right_half,
         } = init_keyboard(cx.core);
 
         key_matrix::spawn().ok();
         battery_handling::spawn().ok();
-        radio_task::spawn(radio).ok();
+        radio_task::spawn(radio, is_right_half).ok();
 
         (
             Shared {},
@@ -69,6 +70,6 @@ mod keyboard_app {
         async fn battery_handling(_: battery_handling::Context);
 
         #[task(priority = 3)]
-        async fn radio_task(_: radio_task::Context, _: Radio);
+        async fn radio_task(_: radio_task::Context, _: Radio, _: bool);
     }
 }

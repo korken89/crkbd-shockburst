@@ -26,6 +26,7 @@ pub struct KeyboardBsp {
     pub battery_voltage: BatteryVoltage,
     pub charger_status: ChargerStatus,
     pub key_matrix: KeyMatrix,
+    pub is_right_half: bool,
 }
 
 pub fn init_keyboard(_: cortex_m::Peripherals) -> KeyboardBsp {
@@ -61,7 +62,7 @@ pub fn init_keyboard(_: cortex_m::Peripherals) -> KeyboardBsp {
     let kio8 = p.P0_29.degrade();
     let kio9 = p.P0_28.degrade();
 
-    let key_matrix = if right_or_left.is_high() {
+    let (is_right_half, key_matrix) = if right_or_left.is_high() {
         defmt::info!("Right keyboard half detected");
 
         let rows = [
@@ -80,7 +81,7 @@ pub fn init_keyboard(_: cortex_m::Peripherals) -> KeyboardBsp {
             Input::new(kio8, Pull::Up),
         ];
 
-        Matrix::new(cols, rows).unwrap()
+        (true, Matrix::new(cols, rows).unwrap())
     } else {
         defmt::info!("Left keyboard half detected");
 
@@ -100,7 +101,7 @@ pub fn init_keyboard(_: cortex_m::Peripherals) -> KeyboardBsp {
             Input::new(kio9, Pull::Up),
         ];
 
-        Matrix::new(cols, rows).unwrap()
+        (false, Matrix::new(cols, rows).unwrap())
     };
 
     // Reset pin so it does not draw power.
@@ -134,6 +135,7 @@ pub fn init_keyboard(_: cortex_m::Peripherals) -> KeyboardBsp {
         battery_voltage,
         charger_status,
         key_matrix,
+        is_right_half,
     }
 }
 

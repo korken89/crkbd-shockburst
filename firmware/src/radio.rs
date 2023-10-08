@@ -383,7 +383,7 @@ impl Radio {
         let timestamp = RadioTimestamps::address_timestamp();
         let rssi = self.radio.rssisample.read().rssisample().bits() as i8;
 
-        defmt::debug!(
+        defmt::trace!(
             "RX complete, address received at {}, rssi = -{} dBm",
             timestamp,
             rssi
@@ -503,7 +503,7 @@ impl Radio {
 
         let timestamp = RadioTimestamps::address_timestamp();
 
-        defmt::debug!("TX complete, address sent at: {}", timestamp);
+        defmt::trace!("TX complete, address sent at: {}", timestamp);
 
         self.radio.shorts.reset();
 
