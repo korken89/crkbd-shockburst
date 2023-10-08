@@ -1,7 +1,6 @@
 [package]
-# TODO(1) fix `authors` and `name` if you didn't use `cargo-generate`
 authors = ["Emil Fresk <emil.fresk@gmail.com>"]
-name = "corne"
+name = "corne-firmware"
 edition = "2021"
 version = "0.1.0"
 autobins = false
@@ -17,10 +16,10 @@ defmt-rtt = "0.4.0"
 panic-probe = { version = "0.3.1", features = ["print-defmt"] }
 #defmt-brtt = { git = "https://github.com/datdenkikniet/defmt-brtt.git" }
 
-rtic = { version = "2.0.1", features = ["thumbv7-backend"] }
-rtic-monotonics = { version = "1.0.1", features = ["defmt", "nrf52833", "embedded-hal-async"] }
-rtic-sync = "1.0.1"
-rtic-common = "1.0.0"
+rtic = { version = "2", features = ["thumbv7-backend"] }
+rtic-monotonics = { version = "1", features = ["defmt", "nrf52833", "embedded-hal-async"] }
+rtic-sync = "1"
+rtic-common = "1"
 
 embassy-nrf = { version = "0.1.0", git = "https://github.com/embassy-rs/embassy.git", features = ["defmt", "nrf52833", "nfc-pins-as-gpio", "time-driver-rtc1", "gpiote", "unstable-pac", "time", "unstable-traits"] }
 embassy-usb = { version = "0.1.0", git = "https://github.com/embassy-rs/embassy.git", features = ["defmt", "msos-descriptor"] }
@@ -30,6 +29,11 @@ embedded-hal = "1.0.0-rc.1"
 
 [[bin]]
 name = "dongle"
+test = false
+bench = false
+
+[[bin]]
+name = "keyboard"
 test = false
 bench = false
 

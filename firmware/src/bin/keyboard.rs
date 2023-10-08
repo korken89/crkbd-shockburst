@@ -4,7 +4,7 @@
 #![feature(async_fn_in_trait)]
 #![allow(incomplete_features)]
 
-use corne as _; // global logger + panicking-behavior + memory layout
+use corne_firmware as _; // global logger + panicking-behavior + memory layout
 use rtic_monotonics::{nrf::timer::Timer0, Monotonic};
 
 pub mod keyboard_tasks;
@@ -16,9 +16,14 @@ defmt::timestamp!("{=u64:us}", {
 });
 
 #[rtic::app(device = embassy_nrf::pac, dispatchers = [SWI0_EGU0], peripherals = false)]
-mod app {
+mod keyboard_app {
     use crate::keyboard_tasks::*;
-    use corne::bsp::{self, BatteryVoltage, KeyMatrix, KeyboardBsp};
+    use corne_firmware::{
+        bsp::keyboard::{
+            init_keyboard, BatteryVoltage, ChargerStatus, KeyMatrix, KeyboardBsp, Led,
+        },
+        radio::Radio,
+    };
 
     #[shared]
     struct Shared {}
@@ -26,6 +31,7 @@ mod app {
     #[local]
     struct Local {
         battery_voltage: BatteryVoltage,
+        charger_status: ChargerStatus,
         key_matrix: KeyMatrix,
     }
 
@@ -34,24 +40,35 @@ mod app {
         defmt::info!("pre init");
 
         let KeyboardBsp {
+            radio,
+            led,
             battery_voltage,
             charger_status,
             key_matrix,
-        } = bsp::init_keyboard(cx.core);
+        } = init_keyboard(cx.core);
 
-        task::spawn().ok();
+        key_matrix::spawn().ok();
+        battery_handling::spawn().ok();
+        radio_task::spawn(radio).ok();
 
         (
             Shared {},
             Local {
                 battery_voltage,
+                charger_status,
                 key_matrix,
             },
         )
     }
 
     extern "Rust" {
-        #[task(local = [battery_voltage, key_matrix])]
-        async fn task(_: task::Context);
+        #[task(local = [key_matrix])]
+        async fn key_matrix(_: key_matrix::Context);
+
+        #[task(local = [battery_voltage, charger_status])]
+        async fn battery_handling(_: battery_handling::Context);
+
+        #[task(priority = 3)]
+        async fn radio_task(_: radio_task::Context, _: Radio);
     }
 }

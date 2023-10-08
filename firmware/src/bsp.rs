@@ -1,10 +1,8 @@
 use core::{mem, ptr::NonNull};
 
 use embassy_nrf::{
-    config::HfclkSource,
-    gpio::{Input, Level, Output, OutputDrive, Pull},
     pac,
-    peripherals::{P0_00, P0_03, PPI_CH0, PPI_CH1, PPI_CH2},
+    peripherals::PPI_CH0,
     ppi::{Event, Ppi, Task},
 };
 use rtic_monotonics::{
@@ -12,38 +10,16 @@ use rtic_monotonics::{
     Monotonic,
 };
 
-pub mod radio;
+pub type Mono = Timer0;
+pub mod dongle;
+pub mod keyboard;
 
-pub type DongleLed = Output<'static, P0_00>;
-pub type Button = Input<'static, P0_03>;
-
-pub struct DongleBsp {
-    pub led: DongleLed,
-    pub button: Button,
-    pub radio: radio::Radio,
-}
-
-#[inline(always)]
-pub fn init_dongle(_: cortex_m::Peripherals) -> DongleBsp {
-    defmt::info!("BSP init");
-
-    let mut config = embassy_nrf::config::Config::default();
-    config.hfclk_source = HfclkSource::ExternalXtal;
-    let p = embassy_nrf::init(config);
-
-    // Systick monotonic uses CC 0, 1 and 2. We use 3, 4, 5 for capturing radio events.
+fn start_timer0_monotonic(ppi0: PPI_CH0) {
+    // Timer0 monotonic uses CC 0, 1 and 2. We use 3, 4, 5 for capturing radio events.
     let systick_token = rtic_monotonics::create_nrf_timer0_monotonic_token!();
     Timer0::start(unsafe { core::mem::transmute(()) }, systick_token);
 
-    RadioTimestamps::start(p.PPI_CH0);
-    let radio: pac::RADIO = unsafe { core::mem::transmute(()) };
-    let radio = radio::Radio::init(radio);
-
-    DongleBsp {
-        led: Output::new(p.P0_00, Level::Low, OutputDrive::Standard),
-        button: Input::new(p.P0_03, Pull::Up),
-        radio,
-    }
+    RadioTimestamps::start(ppi0);
 }
 
 /// Hacky way to timestamp in monotonic time.

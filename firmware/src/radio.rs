@@ -1,6 +1,6 @@
 //! IEEE 802.15.4 radio
 
-use super::RadioTimestamps;
+use crate::bsp::RadioTimestamps;
 use crate::waker_registration::CriticalSectionWakerRegistration;
 use core::{
     ops::{self, RangeFrom},
@@ -13,7 +13,7 @@ use embassy_nrf::pac::{
     radio::{state::STATE_A, txpower::TXPOWER_A},
     Interrupt, RADIO,
 };
-use rtic_monotonics::nrf::timer::fugit::{TimerDurationU32, TimerInstantU32};
+use rtic_monotonics::nrf::timer::fugit::TimerInstantU32;
 
 struct OnDrop<F: FnOnce()> {
     f: core::mem::MaybeUninit<F>,

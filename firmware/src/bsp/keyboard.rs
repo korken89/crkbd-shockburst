@@ -1,56 +1,45 @@
+use crate::radio::Radio;
+
+use super::start_timer0_monotonic;
 use embassy_nrf::{
+    bind_interrupts,
     config::HfclkSource,
     gpio::{AnyPin, Input, Level, Output, OutputDrive, Pin, Pull},
+    pac,
     peripherals::{P0_00, P0_20},
-    saadc::Saadc,
-    {bind_interrupts, saadc},
+    saadc::{self, Saadc},
 };
 use keyberon::matrix::Matrix;
-use rtic_monotonics::nrf::timer::Timer0;
 
-pub struct ChargerStatus {
-    stat: Input<'static, P0_20>,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, defmt::Format, Hash)]
-pub enum ChargingStatus {
-    /// The battery is charging.
-    Charging,
-    // The charging has finished.
-    ChargeComplete,
-}
-
-impl ChargerStatus {
-    pub fn status(&self) -> ChargingStatus {
-        let stat_low = self.stat.is_low();
-
-        match stat_low {
-            true => ChargingStatus::Charging,
-            false => ChargingStatus::ChargeComplete,
-        }
-    }
-}
+pub use super::Mono;
 
 bind_interrupts!(struct Irqs {
     SAADC => saadc::InterruptHandler;
 });
 
 pub type KeyMatrix = Matrix<Input<'static, AnyPin>, Output<'static, AnyPin>, 6, 4>;
+pub type Led = Output<'static, P0_00>;
 
 pub struct KeyboardBsp {
+    pub led: Led,
+    pub radio: Radio,
     pub battery_voltage: BatteryVoltage,
     pub charger_status: ChargerStatus,
     pub key_matrix: KeyMatrix,
 }
 
-#[inline(always)]
 pub fn init_keyboard(_: cortex_m::Peripherals) -> KeyboardBsp {
-    defmt::info!("BSP init");
+    defmt::info!("Keyboard BSP init");
 
     let mut config = embassy_nrf::config::Config::default();
     config.hfclk_source = HfclkSource::ExternalXtal;
-    // config.dcdc.reg0 = true;
     let p = embassy_nrf::init(config);
+
+    start_timer0_monotonic(p.PPI_CH0);
+
+    // SAFETY: Embassy does not support radio, so we conjure it from the PAC.
+    let radio: pac::RADIO = unsafe { core::mem::transmute(()) };
+    let radio = Radio::init(radio);
 
     //
     // Right or left?
@@ -137,14 +126,37 @@ pub fn init_keyboard(_: cortex_m::Peripherals) -> KeyboardBsp {
     let stat = Input::new(p.P0_20, Pull::Up);
     let charger_status = ChargerStatus { stat };
 
-    let systick_token = rtic_monotonics::create_nrf_timer0_monotonic_token!();
-    Timer0::start(unsafe { core::mem::transmute(()) }, systick_token);
     defmt::info!("init done");
 
     KeyboardBsp {
+        led: Output::new(p.P0_00, Level::Low, OutputDrive::Standard),
+        radio,
         battery_voltage,
         charger_status,
         key_matrix,
+    }
+}
+
+pub struct ChargerStatus {
+    stat: Input<'static, P0_20>,
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, defmt::Format, Hash)]
+pub enum ChargingStatus {
+    /// The battery is charging.
+    Charging,
+    // The charging has finished.
+    ChargeComplete,
+}
+
+impl ChargerStatus {
+    pub fn status(&self) -> ChargingStatus {
+        let stat_low = self.stat.is_low();
+
+        match stat_low {
+            true => ChargingStatus::Charging,
+            false => ChargingStatus::ChargeComplete,
+        }
     }
 }
 

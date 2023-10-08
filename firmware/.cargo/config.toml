@@ -8,9 +8,6 @@ runner = "probe-rs run --chip nRF52833_xxAA"
 #   "-C", "link-arg=--nmagic",
 # ]
 
-[env]
-DEFMT_LOG = "info"
-
 [build]
 target = "thumbv7em-none-eabihf" # Cortex-M4F and Cortex-M7F (with FPU)
 
