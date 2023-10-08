@@ -302,6 +302,20 @@ impl Radio {
         }
     }
 
+    /// Changes the radio frequency in 2400 MHz + `val` where `val = 0..=100`.
+    pub fn set_freqeuency(&mut self, frequency: u8) {
+        if frequency > 100 {
+            panic!("Invalid frequency setting");
+        }
+
+        self.needs_enable = true;
+        unsafe {
+            self.radio
+                .frequency
+                .write(|w| w.map().clear_bit().frequency().bits(frequency))
+        }
+    }
+
     /// Changes the Clear Channel Assessment method
     pub fn set_cca(&mut self, cca: Cca) {
         self.needs_enable = true;
