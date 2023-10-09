@@ -424,7 +424,7 @@ impl Radio {
     }
 
     fn cancel_recv() {
-        let radio: pac::RADIO = unsafe { core::mem::transmute(()) };
+        let radio = unsafe { &*pac::RADIO::PTR };
         radio.tasks_stop.write(|w| w.tasks_stop().set_bit());
         while radio.state.read().state().variant().unwrap() != STATE_A::RX_IDLE {}
         // DMA transfer may have been in progress so synchronize with its memory operations
@@ -603,7 +603,7 @@ impl Radio {
 
         let (disable, enable) = match state {
             State::Disabled => (false, true),
-            State::RxIdle => (false, self.needs_enable),
+            State::RxIdle => (self.needs_enable, self.needs_enable),
             // NOTE to avoid errata 204 (see rev1 v1.4) we do TXIDLE -> DISABLED -> RXIDLE
             State::TxIdle => (true, true),
         };
@@ -638,8 +638,14 @@ impl Radio {
             .txaddress
             .write(|w| unsafe { w.txaddress().bits(0) });
 
-        if state != State::TxIdle || self.needs_enable {
+        if state != State::Disabled || self.needs_enable {
             self.needs_enable = false;
+
+            self.radio
+                .tasks_disable
+                .write(|w| w.tasks_disable().set_bit());
+            self.wait_for_state_a(STATE_A::DISABLED);
+
             self.radio.tasks_txen.write(|w| w.tasks_txen().set_bit());
             self.wait_for_state_a(STATE_A::TX_IDLE);
         }
@@ -653,7 +659,7 @@ impl Radio {
             STATE_A::RX_IDLE => State::RxIdle,
 
             // transitory states
-            STATE_A::TX_DISABLE => {
+            STATE_A::TX_DISABLE | STATE_A::RX_DISABLE => {
                 self.wait_for_state_a(STATE_A::DISABLED);
                 State::Disabled
             }
@@ -731,7 +737,7 @@ impl Radio {
 }
 
 /// Error
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, defmt::Format)]
 pub enum Error {
     /// Incorrect CRC
     Crc(u16),
@@ -743,7 +749,7 @@ pub enum Error {
 ///
 /// After, or at the start of, any method call the RADIO will be in one of these states
 // This is a subset of the STATE_A enum
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Debug, defmt::Format)]
 enum State {
     Disabled,
     RxIdle,

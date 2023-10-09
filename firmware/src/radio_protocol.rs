@@ -75,23 +75,26 @@ pub async fn dongle_radio_runner(mut radio: Radio) -> ! {
         //
         Mono::delay_until(slot_start_time).await;
 
-        defmt::info!(
-            "Trying to send on channel {} ({}) at {}...",
-            channel_hopping.current_channel(),
-            channel_hopping.state,
-            slot_start_time
-        );
+        // defmt::info!(
+        //     "Trying to send on channel {} ({}) at {}...",
+        //     channel_hopping.current_channel(),
+        //     channel_hopping.state,
+        //     slot_start_time
+        // );
 
         radio.set_freqeuency(channel_hopping.current_channel());
         // TODO: Actually send something as sync
         packet.copy_from_slice(&[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-        let sync_timestamp = radio.send(&mut packet).await.0;
+        let sync_timestamp = radio.send_no_cca(&mut packet).await.0;
 
         //
         // 2. Receive and channel hop, look for keyboard halves responses.
         //
         channel_hopping.next_channel();
         slot_start_time += 2.millis();
+
+        let mut correct_rxes = 0;
+        let mut missed_rxes = 0;
 
         while !channel_hopping.is_initial_state() {
             radio.set_freqeuency(channel_hopping.current_channel());
@@ -100,7 +103,13 @@ pub async fn dongle_radio_runner(mut radio: Radio) -> ! {
             match Mono::timeout_at(slot_start_time + 1800.micros(), radio.recv(&mut packet)).await {
                 Ok(ts) => {
                     if let Ok((ts, rssi)) = ts {
-                        defmt::debug!("Got data, channel {}: {}", channel_hopping.state(), *packet,);
+                        // defmt::debug!(
+                        //     "Got data, channel {} ({}): {}",
+                        //     channel_hopping.state(),
+                        //     rssi,
+                        //     *packet,
+                        // );
+                        correct_rxes += 1;
 
                         // TODO: Send ack.
                         packet.copy_from_slice(&[10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
@@ -108,13 +117,20 @@ pub async fn dongle_radio_runner(mut radio: Radio) -> ! {
                     }
                 }
                 Err(_timeout) => {
-                    defmt::trace!("No data, channel {}", channel_hopping.current_channel())
+                    missed_rxes += 1;
+                    //defmt::warn!("No data, channel {}", channel_hopping.state())
                 }
             };
 
             channel_hopping.next_channel();
             slot_start_time += 2.millis(); // 2 ms per RX slot
         }
+
+        defmt::info!(
+            "This master frame got {} successful RXes and {} missed",
+            correct_rxes,
+            missed_rxes
+        );
     }
 }
 
@@ -198,7 +214,7 @@ pub async fn keyboard_radio_runner(mut radio: Radio, is_right_half: bool) -> ! {
                     packet.copy_from_slice(&[channel_hopping.state()]);
 
                     Mono::delay_until(slot_start_time).await;
-                    let timestamp = radio.send(&mut packet).await;
+                    let timestamp = radio.send_no_cca(&mut packet).await;
 
                     defmt::info!(
                         "Sent at {}, sync = {}, diff = {} ms",
