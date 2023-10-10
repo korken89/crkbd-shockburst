@@ -27,6 +27,9 @@ embassy-usb = { version = "0.1.0", git = "https://github.com/embassy-rs/embassy.
 embedded-hal-async = "1.0.0-rc.1"
 embedded-hal = "1.0.0-rc.1"
 
+p256-cortex-m4 = { version = "0.1.0-alpha.6", features = ["prehash"] }
+chacha20poly1305 = { version = "0.10.1", default-features = false, features = ["heapless", "reduced-round", "rand_core"] }
+
 [[bin]]
 name = "dongle"
 test = false

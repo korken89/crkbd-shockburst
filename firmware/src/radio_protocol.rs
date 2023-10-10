@@ -1,14 +1,37 @@
-//! Radio communication
+//! # Radio communication
+//!
+//! ## Registering keyboard to dongle
+//!
+//! 1. Dongle waits until button held for 3 sec, this will cause it to go into pair mode.
+//!        - When in pair mode a periodic "ready to pair" message will be send until 2 keyboard
+//!          halves have connected.
+//! 2. A keyboard half is then allowed to try to connect by performing an ECDH key exchange.
+//!        - A presentation packet is sent from the keyboard to the dongle (ID + right/left)
+//!        - Dongle ACKs or rejects due to collision (right/left already paired).
+//!        - Public keys are exchanged.
+//!        - Shared secret is established and ChaCha8Poly1305 is used for symmetric encryption.
+//!        - TODO: Do we need some signature verification?
+//!
+//! ## Reconnecting keyboard to dongle when already paired
+//!
+//! 1. A keyboard half is then allowed to try to connect by performing an ECDH key exchange.
+//!        - A presentation packet is sent from the keyboard to the dongle (ID + right/left)
+//!        - Dongle ACKs or rejects due to wrong id (already paired to different ID).
+//!        - Public keys are exchanged.
+//!        - Shared secret is established and ChaCha8Poly1305 is used for symmetric encryption.
+//!
+//! ## After handshake between keyboard and dongle
 //!
 //! 1. The dongle will be sending "sync" frames every 100 rounds, this is when we are at a known channel.
 //!     - All messages in each frame will be frequency hopping according to a known pattern.
 //! 2. After sync is received, the keyboard halves will send their state in predetermined slots.
-//!     - Each slot will be X ms, where each X is the right half's and every X+1 is the left's.
+//!     - Each slot will be 2 ms, where even slots is the right half's and odd slots is the left's.
 //!     - If there has been a state change in the keyboard input, the new full state will be sent.
 //!     - It will be sent, expecting an ACK from the dongle.
 //!     - If no ACK is received, the state will be retransmitted until an ACK is received, or
 //!       until the keyboard gets a new state.
 //!     - If there is no new data for a full frame, the keyboard will send out its state anyways.
+//! 3. Keyboards can "disconnect" tecdsao save power... somehow...
 
 use crate::bsp::dongle::DongleLed;
 use crate::bsp::Mono;
