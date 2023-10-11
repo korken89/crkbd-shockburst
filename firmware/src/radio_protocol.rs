@@ -36,7 +36,7 @@
 use crate::bsp::dongle::DongleLed;
 use crate::bsp::Mono;
 use crate::radio::{Packet, Radio};
-use rtic_monotonics::nrf::timer::fugit::TimerInstantU64;
+use rtic_monotonics::nrf::timer::fugit::{TimerDurationU64, TimerInstantU64};
 use rtic_monotonics::{nrf::timer::*, Monotonic};
 
 /// A channel hopping selector implementation.
@@ -86,6 +86,9 @@ impl ChannelHopping {
     }
 }
 
+/// The size of an slot in the protocol in microseconds.
+pub const SLOT_SIZE: TimerDurationU64<1_000_000> = TimerDurationU64::micros(2000);
+
 /// Main runner for the dongle's radio communication.
 pub async fn dongle_radio_runner(mut radio: Radio) -> ! {
     let mut packet = Packet::new();
@@ -114,7 +117,7 @@ pub async fn dongle_radio_runner(mut radio: Radio) -> ! {
         // 2. Receive and channel hop, look for keyboard halves responses.
         //
         channel_hopping.next_channel();
-        slot_start_time += 2.millis();
+        slot_start_time += SLOT_SIZE;
 
         let mut correct_rxes = 0;
         let mut missed_rxes = 0;
@@ -123,7 +126,12 @@ pub async fn dongle_radio_runner(mut radio: Radio) -> ! {
             radio.set_freqeuency(channel_hopping.current_channel());
 
             // Look for packets, stop receiving a little before the next round.
-            match Mono::timeout_at(slot_start_time + 1800.micros(), radio.recv(&mut packet)).await {
+            match Mono::timeout_at(
+                slot_start_time + SLOT_SIZE - 200.micros(),
+                radio.recv(&mut packet),
+            )
+            .await
+            {
                 Ok(ts) => {
                     if let Ok((ts, rssi)) = ts {
                         // defmt::debug!(
@@ -146,7 +154,7 @@ pub async fn dongle_radio_runner(mut radio: Radio) -> ! {
             };
 
             channel_hopping.next_channel();
-            slot_start_time += 2.millis(); // 2 ms per RX slot
+            slot_start_time += SLOT_SIZE;
         }
 
         defmt::info!(
@@ -213,7 +221,7 @@ pub async fn keyboard_radio_runner(mut radio: Radio, is_right_half: bool) -> ! {
                         channel_hopping.next_channel();
                         state = KeyboardRadioState::Synchronized {
                             sync_time: now,
-                            slot_start_time: now + 2000.micros(),
+                            slot_start_time: now + SLOT_SIZE,
                         };
                     } else {
                         // Left half gets the even slots.
@@ -221,7 +229,7 @@ pub async fn keyboard_radio_runner(mut radio: Radio, is_right_half: bool) -> ! {
                         channel_hopping.next_channel();
                         state = KeyboardRadioState::Synchronized {
                             sync_time: now,
-                            slot_start_time: now + 4000.micros(),
+                            slot_start_time: now + 2 * SLOT_SIZE,
                         };
                     }
                 }
@@ -258,20 +266,22 @@ pub async fn keyboard_radio_runner(mut radio: Radio, is_right_half: bool) -> ! {
                         }
                     };
 
-                    slot_start_time += 4.millis();
-
                     // Jump 2 channels as every keyboard half gets half of the slots.
+                    slot_start_time += SLOT_SIZE;
                     channel_hopping.next_channel();
                     if channel_hopping.is_initial_state() {
                         break;
                     }
 
+                    slot_start_time += SLOT_SIZE;
                     channel_hopping.next_channel();
                     if channel_hopping.is_initial_state() {
                         break;
                     }
                 }
 
+                // TODO: Check for sync instead of dropping back to "initial sync search", that
+                // should only happen if we've lost sync for multiple frames.
                 state = KeyboardRadioState::LookingForSync;
             }
         }
