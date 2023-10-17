@@ -22,18 +22,18 @@
 //!
 //! ## After handshake between keyboard and dongle
 //!
-//! 1. The dongle will be sending "sync" frames every 100 rounds, this is when we are at a known channel.
+//! 1. The dongle will be sending "sync" frames at the start of rounds, this is when we are at a known channel.
 //!     - All messages in each frame will be frequency hopping according to a known pattern.
 //! 2. After sync is received, the keyboard halves will send their state in predetermined slots.
-//!     - Each slot will be 2 ms, where even slots is the right half's and odd slots is the left's.
+//!     - Each slot will be 1 ms, where even slots is the right half's and odd slots is the left's.
 //!     - If there has been a state change in the keyboard input, the new full state will be sent.
 //!     - It will be sent, expecting an ACK from the dongle.
 //!     - If no ACK is received, the state will be retransmitted until an ACK is received, or
 //!       until the keyboard gets a new state.
 //!     - If there is no new data for a full frame, the keyboard will send out its state anyways.
-//! 3. Keyboards can "disconnect" tecdsao save power... somehow...
+//! 3. Keyboards can "disconnect" to save power... somehow...
 
-use crate::bsp::dongle::DongleLed;
+// use crate::bsp::dongle::DongleLed;
 use crate::bsp::Mono;
 use crate::radio::{Packet, Radio};
 use rtic_monotonics::nrf::timer::fugit::{TimerDurationU64, TimerInstantU64};
@@ -91,11 +91,15 @@ impl ChannelHopping {
     }
 }
 
-/// The size of an slot in the protocol in microseconds.
-pub const SLOT_SIZE: TimerDurationU64<1_000_000> = TimerDurationU64::micros(2000);
+/// The size of an slot in the protocol in microseconds (empirically this needs to be > 600 us)>
+pub const SLOT_SIZE: TimerDurationU64<1_000_000> = TimerDurationU64::micros(1_000);
 
 /// Main runner for the dongle's radio communication.
 pub async fn dongle_radio_runner(mut radio: Radio) -> ! {
+    // 1. Pairing stage
+
+    // 2. Connected stage
+
     let mut packet = Packet::new();
     let mut slot_start_time = Mono::now() + 200.millis();
     let mut channel_hopping = ChannelHopping::new();
@@ -186,6 +190,8 @@ pub async fn keyboard_radio_runner(mut radio: Radio, is_right_half: bool) -> ! {
 
     let mut state = KeyboardRadioState::LookingForSync;
 
+    let mut i = 0;
+
     // RX code:
     loop {
         // if led.is_set_high() {
@@ -196,6 +202,9 @@ pub async fn keyboard_radio_runner(mut radio: Radio, is_right_half: bool) -> ! {
 
         match state {
             KeyboardRadioState::LookingForSync => {
+                defmt::info!("Got {} acks last round", i);
+                i = 0;
+
                 channel_hopping.reset();
                 radio.set_freqeuency(channel_hopping.current_channel());
                 let (timestamp, rssi) = if let Ok(v) = radio.recv(&mut packet).await {
@@ -205,16 +214,16 @@ pub async fn keyboard_radio_runner(mut radio: Radio, is_right_half: bool) -> ! {
                     continue;
                 };
 
-                defmt::info!(
-                    "Radio receive ts {}, rssi {}, packet: {}",
-                    timestamp,
-                    rssi,
-                    *packet
-                );
+                // defmt::info!(
+                //     "Radio receive ts {}, rssi {}, packet: {}",
+                //     timestamp,
+                //     rssi,
+                //     *packet
+                // );
 
                 if channel_hopping.is_initial_state() && &*packet == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
                 {
-                    defmt::error!("Sync found at {}", timestamp.0);
+                    defmt::info!("Sync found at {}", timestamp.0);
 
                     // Hack to get RX timestamp in mono time...
                     let now = TimerInstantU64::from_ticks(
@@ -252,22 +261,23 @@ pub async fn keyboard_radio_runner(mut radio: Radio, is_right_half: bool) -> ! {
                     Mono::delay_until(slot_start_time).await;
                     let timestamp = radio.send_no_cca(&mut packet).await;
 
-                    defmt::info!(
-                        "Sent at {}, sync = {}, diff = {} ms",
-                        timestamp.0,
-                        slot_start_time,
-                        (slot_start_time - sync_time).to_millis(),
-                    );
+                    // defmt::info!(
+                    //     "Sent at {}, sync = {}, diff = {} ms",
+                    //     timestamp.0,
+                    //     slot_start_time,
+                    //     (slot_start_time - sync_time).to_millis(),
+                    // );
 
                     // Look for ACK.
                     match Mono::timeout_at(slot_start_time + 1800.micros(), radio.recv(&mut packet))
                         .await
                     {
                         Ok(_) => {
-                            defmt::info!("Got ack, channel {}", channel_hopping.current_channel());
+                            i += 1;
+                            // defmt::info!("Got ack, channel {}", channel_hopping.current_channel());
                         }
                         Err(_timeout) => {
-                            defmt::warn!("No ack, channel {}", channel_hopping.current_channel(),)
+                            // defmt::warn!("No ack, channel {}", channel_hopping.current_channel(),)
                         }
                     };
 

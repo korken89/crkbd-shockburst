@@ -1,9 +1,14 @@
 use crate::dongle_app::*;
 use corne_firmware::radio::Radio;
 
+#[cfg(feature = "dongle_radio")]
 pub async fn radio_task(_: radio_task::Context<'_>, radio: Radio) -> ! {
     corne_firmware::radio_protocol::dongle_radio_runner(radio).await
-    // corne_firmware::radio_protocol::keyboard_radio_runner(radio, true).await
+}
+
+#[cfg(feature = "keyboard_radio")]
+pub async fn radio_task(_: radio_task::Context<'_>, radio: Radio) -> ! {
+    corne_firmware::radio_protocol::keyboard_radio_runner(radio, true).await
 }
 
 // OLD CODE

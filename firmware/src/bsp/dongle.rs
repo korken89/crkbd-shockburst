@@ -42,7 +42,11 @@ pub fn init_dongle(_: cortex_m::Peripherals) -> DongleBsp {
     let radio = Radio::init(radio);
 
     // Testing crypto
+    let n = Mono::now();
     let mut rng = Rng::new(p.RNG, Irqs);
+    let d = Mono::now() - n;
+
+    defmt::error!("Key generation took {}", d);
 
     // On unit A
     let keypair_a = Keypair::random(&mut rng);
@@ -66,8 +70,9 @@ pub fn init_dongle(_: cortex_m::Peripherals) -> DongleBsp {
     defmt::info!("Time to generate shared secret: {}", a - n);
 
     let id = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10u8];
-    let n = Mono::now();
+    let s = Mono::now();
     let signature = keypair_a.secret.sign_prehashed(&id, &mut rng);
+    let n = Mono::now();
 
     let verification = keypair_a.public.verify_prehashed(&id, &signature);
     let a = Mono::now();
@@ -77,7 +82,8 @@ pub fn init_dongle(_: cortex_m::Peripherals) -> DongleBsp {
         verification,
         signature.to_untagged_bytes()
     );
-    defmt::info!("Time to sign and verify signature: {}", a - n);
+    defmt::info!("Time to sign: {}", n - s);
+    defmt::info!("Time to verify signature: {}", a - n);
 
     let sec1 = keypair_a.public.to_compressed_sec1_bytes();
     defmt::info!("Compressed public key: {:x}", sec1);
