@@ -2,6 +2,17 @@
 
 Firmware for the CherryBurst/ChocBurst keyboard and associated dongle.
 
+# Testing commands
+
+Dongle radio side:
+
+`DEFMT_LOG=info cargo rrb dongle --features dongle_radio -- --probe 1209:4853:dc61cd078f594c37ef4014 --no-location`
+
+Keyboard radio side:
+
+`DEFMT_LOG=info cargo rrb dongle --features keyboard_radio -- --probe 1209:4853:dc61cd078f667031ef4014 --no-location`
+
+
 ## License
 
 Licensed under either of
