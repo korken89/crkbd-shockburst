@@ -42,14 +42,17 @@ pub fn init_dongle(_: cortex_m::Peripherals) -> DongleBsp {
     let radio = Radio::init(radio);
 
     // Testing crypto
-    let n = Mono::now();
     let mut rng = Rng::new(p.RNG, Irqs);
-    let d = Mono::now() - n;
+    rng.set_bias_correction(true);
 
-    defmt::error!("Key generation took {}", d);
+    let n = Mono::now();
 
     // On unit A
     let keypair_a = Keypair::random(&mut rng);
+
+    let d = Mono::now() - n;
+    defmt::error!("Key generation took {}", d);
+
     // On unit B
     let keypair_b = Keypair::random(&mut rng);
 
@@ -71,10 +74,10 @@ pub fn init_dongle(_: cortex_m::Peripherals) -> DongleBsp {
 
     let id = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10u8];
     let s = Mono::now();
-    let signature = keypair_a.secret.sign_prehashed(&id, &mut rng);
+    let signature = keypair_a.secret.sign(&id, &mut rng);
     let n = Mono::now();
 
-    let verification = keypair_a.public.verify_prehashed(&id, &signature);
+    let verification = keypair_a.public.verify(&id, &signature);
     let a = Mono::now();
 
     defmt::info!(
