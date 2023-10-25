@@ -31,8 +31,9 @@ p256-cortex-m4 = { version = "0.1.0-alpha.6", features = ["prehash"] }
 chacha20poly1305 = { version = "0.10.1", default-features = false, features = ["heapless", "reduced-round", "rand_core"] }
 ccm = { version = "0.5", default-features = false, features = ["heapless"] }
 aes = { version = "0.8" }
-x25519-cortex-m4 = { git = "https://github.com/korken89/x25519-cortex-m4" }
+curve25519-cortex-m4 = { git = "https://github.com/korken89/curve25519-cortex-m4" }
 rand_chacha = { version = "0.3.1", default-features = false }
+salty = "0.3.0"
 
 [features]
 default = []

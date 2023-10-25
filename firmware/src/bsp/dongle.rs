@@ -48,7 +48,7 @@ pub fn init_dongle(_: cortex_m::Peripherals) -> DongleBsp {
     rng.set_bias_correction(true);
 
     let mut seed = [0; 32];
-    rng.fill_bytes(&mut seed);
+    rng.blocking_fill_bytes(&mut seed);
     let mut rng2 = rand_chacha::ChaCha8Rng::from_seed(seed);
 
     defmt::info!("");
@@ -108,15 +108,16 @@ pub fn init_dongle(_: cortex_m::Peripherals) -> DongleBsp {
     defmt::info!("");
 
     {
+        // X25519
         let n = Mono::now();
-        let keypair1 = x25519_cortex_m4::Keypair::random(&mut rng2);
+        let keypair1 = curve25519_cortex_m4::x25519::Keypair::random(&mut rng2);
         let d = Mono::now() - n;
 
         defmt::info!("generate x25519 key: {}", d);
         defmt::info!("public key: {}", keypair1.public.as_bytes());
 
         let n = Mono::now();
-        let keypair2 = x25519_cortex_m4::Keypair::random(&mut rng);
+        let keypair2 = curve25519_cortex_m4::x25519::Keypair::random(&mut rng);
         let d = Mono::now() - n;
 
         defmt::info!("generate x25519 key2: {}", d);
@@ -130,6 +131,37 @@ pub fn init_dongle(_: cortex_m::Peripherals) -> DongleBsp {
         let secret2 = keypair2.secret.agree(&keypair1.public);
         defmt::info!("x25519 secret1: {}", secret1.as_bytes());
         defmt::info!("x25519 secret2: {}", secret2.as_bytes());
+    }
+    defmt::info!("");
+
+    {
+        use salty::agreement;
+        // salty
+        let mut seed = [0; 32];
+        rng.blocking_fill_bytes(&mut seed);
+
+        let n = Mono::now();
+        let secret1 = agreement::SecretKey::from_seed(&seed);
+        let public1 = secret1.public();
+        let d = Mono::now() - n;
+
+        defmt::info!("generate x25519 key: {}", d);
+        defmt::info!("public key: {}", public1.to_bytes());
+
+        rng.blocking_fill_bytes(&mut seed);
+
+        let secret2 = agreement::SecretKey::from_seed(&seed);
+        let public2 = secret2.public();
+        defmt::info!("public key: {}", public2.to_bytes());
+
+        let n = Mono::now();
+        let secret1 = secret1.agree(&public2);
+        let d = Mono::now() - n;
+        defmt::info!("generate x25519 secret: {}", d);
+
+        let secret2 = secret2.agree(&public1);
+        defmt::info!("x25519 secret1: {}", secret1.to_bytes());
+        defmt::info!("x25519 secret2: {}", secret2.to_bytes());
     }
     defmt::info!("");
 
@@ -175,10 +207,10 @@ pub fn init_dongle(_: cortex_m::Peripherals) -> DongleBsp {
         let nonce = GenericArray::from_slice(b"unique nonce."); // 13-bytes; unique per message
 
         let mut block = ccm::aead::heapless::Vec::<u8, 128>::new();
-        block.extend_from_slice(&[42; 64]);
+        block.extend_from_slice(&[42; 64]).ok();
 
         let n = Mono::now();
-        cipher.encrypt_in_place(&nonce, b"", &mut block);
+        cipher.encrypt_in_place(&nonce, b"", &mut block).ok();
         let d = Mono::now() - n;
 
         defmt::info!("Aes encrypt: {}", d);
@@ -186,7 +218,7 @@ pub fn init_dongle(_: cortex_m::Peripherals) -> DongleBsp {
 
         // And decrypt it back
         let n = Mono::now();
-        cipher.decrypt_in_place(&nonce, b"", &mut block);
+        cipher.decrypt_in_place(&nonce, b"", &mut block).ok();
         let d = Mono::now() - n;
 
         defmt::info!("Aes decrypt: {}", d);
@@ -197,7 +229,7 @@ pub fn init_dongle(_: cortex_m::Peripherals) -> DongleBsp {
     {
         use chacha20poly1305::{
             aead::{heapless, AeadCore, KeyInit},
-            ChaCha8Poly1305, Nonce,
+            ChaCha8Poly1305,
         };
 
         let key = ChaCha8Poly1305::generate_key(&mut rng);
@@ -205,10 +237,10 @@ pub fn init_dongle(_: cortex_m::Peripherals) -> DongleBsp {
         let nonce = ChaCha8Poly1305::generate_nonce(&mut rng); // 96-bits; unique per message
 
         let mut block = heapless::Vec::<u8, 128>::new();
-        block.extend_from_slice(&[42; 64]);
+        block.extend_from_slice(&[42; 64]).ok();
 
         let n = Mono::now();
-        cipher.encrypt_in_place(&nonce, b"", &mut block);
+        cipher.encrypt_in_place(&nonce, b"", &mut block).ok();
         let d = Mono::now() - n;
 
         defmt::info!("Chacha encrypt: {}", d);
@@ -220,7 +252,7 @@ pub fn init_dongle(_: cortex_m::Peripherals) -> DongleBsp {
 
         // And decrypt it back
         let n = Mono::now();
-        cipher.decrypt_in_place(&nonce, b"", &mut block);
+        cipher.decrypt_in_place(&nonce, b"", &mut block).ok();
         let d = Mono::now() - n;
 
         defmt::info!("Chacha decrypt: {}", d);
